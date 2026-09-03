@@ -63,8 +63,11 @@ function preToolPrompt(reason) {
   process.exit(0);
 }
 
+// SessionStart does NOT reliably honor the documented hookSpecificOutput.systemMessage
+// JSON schema in this build (verified empirically — see plugin README). Plain stdout text
+// is what actually surfaces here, same mechanism the caveman plugin's SessionStart hook uses.
 function sessionStartMessage(message) {
-  process.stdout.write(JSON.stringify({ systemMessage: message }));
+  process.stdout.write(message);
   process.exit(0);
 }
 
