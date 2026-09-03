@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "my-skills",
-      "description": "Personal skill bundle: Jira worklog automation, EN-VI translation, Vietnamese tech writing.",
+      "description": "Personal skill bundle: EN-VI translation, Vietnamese tech writing.",
       "source": "./plugins/my-skills",
       "category": "productivity"
     }
