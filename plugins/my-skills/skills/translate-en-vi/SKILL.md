@@ -45,8 +45,11 @@ translate it directly.
    judgment call. Note a choice only when it's a real coin-flip that materially changes
    meaning.
    **Exception — a bare word or short fragment with no sentence around it:** list its 2-3
-   common senses with their distinct Vietnamese translations instead, dictionary-style (e.g.
-   "cadence" → nhịp điệu / tiết tấu / nhịp độ, one per sense). There's no surrounding context
+   common senses with their distinct Vietnamese translations instead, dictionary-style,
+   **ordered most-frequent sense first** (e.g. "cadence" → 1. nhịp điệu — rhythm/flow, general
+   use [most common] 2. tiết tấu — musical rhythm, specialized 3. nhịp độ — pace of a process,
+   figurative). One Vietnamese term per sense, each labeled with what distinguishes it — never
+   a bare slash-list of near-synonyms with no sense attached. There's no surrounding context
    to disambiguate with, so collapsing to one answer silently discards a distinction the
    input itself can't rule out.
 
@@ -144,13 +147,21 @@ words. This is the whole point of the skill; treat it as required output, not a 
 (skip `a`, `the`, `is`, basic pronouns; include phrasal verbs, idioms, collocations,
 less-common single words):
 
-| English | IPA | Loại từ | Nghĩa | Ghi chú |
-|---|---|---|---|---|
-| e.g. `heads up` | /hɛdz ʌp/ | cụm động từ (phrasal) | báo trước, thông báo sớm | thân mật, dùng khi báo tin ngắn gọn |
+| English | IPA | Loại từ | Nghĩa | Cụm từ đi kèm | Ghi chú |
+|---|---|---|---|---|---|
+| e.g. `heads up` | /hɛdz ʌp/ | cụm động từ (phrasal) | báo trước, thông báo sớm | *give someone a heads up* | thân mật, dùng khi báo tin ngắn gọn |
 
-- IPA for anything whose pronunciation isn't obvious from spelling; skip it for trivial words.
-- `Ghi chú` carries what a dictionary entry alone doesn't: register, when it's used, a
-  near-synonym contrast if one is easy to confuse with it.
+- **IPA convention: General American**, e.g. `/ˈʃɛdʒuːl/` not RP `/ˈʃɛdjuːl/`. Note the RP
+  form in `Ghi chú` only when the two differ enough to matter (`schedule`, `either`, `vase`);
+  skip IPA entirely for trivial/obvious-spelling words.
+- `Cụm từ đi kèm` — the word's most natural collocation from the source or a standard one
+  (`make a decision`, not `do a decision`; `heavy rain`, not `strong rain`). Leave blank only
+  when the word doesn't collocate distinctively (most concrete nouns, proper nouns).
+- `Ghi chú` carries what a dictionary entry alone doesn't: **register** (trang trọng / thân
+  mật / lóng / trung tính — name it explicitly, don't leave it implicit), when it's used, and
+  a near-synonym contrast if one is easy to confuse with it.
+- For a word with a notable irregular inflection (irregular plural, irregular verb forms,
+  comparative), name it in `Ghi chú` — e.g. `child → children`, `go/went/gone`.
 
 **Grammar & structure** — bullet list naming each notable construction in the source
 (tense, conditional, passive voice, phrasal verb pattern, idiom syntax) and explaining briefly,
@@ -162,9 +173,11 @@ structures, each with its own Vietnamese translation, so the learner sees the wo
 in a second context.
 
 **Bare word/short fragment (rule 7's exception):** skip the three-part structure above.
-Instead, for each sense: the word, IPA, part of speech, the Vietnamese translation, and one
-example sentence. This already covers meaning + pronunciation + usage for a single-word
-lookup — a separate breakdown table would just repeat it.
+Instead, for each sense, ordered most-frequent first: the word, IPA (General American, per
+above), part of speech, **register**, the Vietnamese translation, its most natural
+collocation if it has one, an irregular inflection if it has one, and one example sentence
+using that specific sense. This already covers meaning + pronunciation + usage for a
+single-word lookup — a separate breakdown table would just repeat it.
 
 ## Vocabulary Memory (spaced repetition)
 
@@ -209,6 +222,11 @@ never learns anything about the user, and every later table above depends on it 
 - One reading chosen for any ambiguity — no hedged multi-option output?
 - Vocabulary table covers every above-elementary word/phrase in the source, not just the
   obviously hard ones?
+- IPA is General American throughout, with RP noted only where it meaningfully differs?
+- Register named explicitly for each entry (not left implicit), and a collocation given
+  wherever the word naturally has one?
+- Bare-word/fragment senses ordered most-frequent-first, each with its own labeled sense —
+  not a bare slash-list of near-synonyms?
 - Grammar/structure notes present if the source has any construction above elementary level?
 - `vocab-log.md` checked before building the table, and updated for every word after
   responding?
@@ -241,7 +259,11 @@ Still check and update `vocab-log.md` for the word looked up.
 | Word-for-word idiom translation | Use the natural Vietnamese equivalent |
 | Keeping English number/date format (`1,234.56`, `MM/DD`) in prose | Convert to `1.234,56`, `DD/MM` |
 | Hedging with two translations for an ambiguous line | Pick the single most natural reading |
-| Collapsing a bare ambiguous word (no sentence) to one translation | List its 2-3 common senses, dictionary-style |
+| Collapsing a bare ambiguous word (no sentence) to one translation | List its 2-3 common senses, dictionary-style, most-frequent first |
+| Listing senses as a bare slash of near-synonyms with no distinction | Label what distinguishes each sense (domain, frequency, register) |
+| Using RP IPA (`/ˈʃɛdjuːl/`) as the default | Default to General American; note RP only where it meaningfully differs |
+| Vocabulary row with no register named | Name it explicitly: trang trọng / thân mật / lóng / trung tính |
+| Vocabulary row missing a natural collocation the word has | Add it (`make a decision`, not `do a decision`) |
 | Returning only the translation, no learning notes | Always include vocab table + grammar notes + examples for sentence input |
 | Vocabulary table with only 2-3 "hardest" words | Cover every above-elementary word/phrase, comprehensively |
 | Explaining a mastered word (5+ times seen) in full again | Collapse to a one-line reminder instead |
