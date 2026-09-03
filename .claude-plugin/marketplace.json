@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "locvd-skills",
+  "description": "Personal Claude Code skills marketplace.",
+  "owner": {
+    "name": "locvd"
+  },
+  "plugins": [
+    {
+      "name": "my-skills",
+      "description": "Personal skill bundle: Jira worklog automation, EN-VI translation, Vietnamese tech writing.",
+      "source": "./plugins/my-skills",
+      "category": "productivity"
+    }
+  ]
+}
