@@ -1,7 +1,7 @@
 {
   "name": "my-skills",
-  "version": "0.1.0",
-  "description": "Personal skill bundle: EN-VI translation, Vietnamese tech writing.",
+  "version": "0.2.0",
+  "description": "Personal skill bundle: EN-VI translation, Vietnamese tech writing, Vietnamese concept explainer.",
   "author": {
     "name": "locvd"
   }
