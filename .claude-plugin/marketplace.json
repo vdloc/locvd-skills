@@ -11,6 +11,12 @@
       "description": "Personal skill bundle: EN-VI translation, Vietnamese tech writing.",
       "source": "./plugins/my-skills",
       "category": "productivity"
+    },
+    {
+      "name": "frontend-guardrails",
+      "description": "Guardrail/productivity hooks for Next.js + React + Three.js + GSAP.",
+      "source": "./plugins/frontend-guardrails",
+      "category": "productivity"
     }
   ]
 }
