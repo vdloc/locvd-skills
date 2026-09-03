@@ -1,6 +1,6 @@
 {
   "name": "frontend-guardrails",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Guardrail/productivity hooks for Next.js + React + Three.js + GSAP projects. All checks are silent no-ops outside a matching project (guarded on package.json deps).",
   "author": {
     "name": "locvd"
@@ -9,8 +9,8 @@
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-versions.js\"", "timeout": 10 },
-          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/_debug-sessionstart.js\"", "timeout": 10 }
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/_debug-sessionstart.js\"", "timeout": 10 },
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-versions.js\"", "timeout": 10 }
         ]
       }
     ],
