@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "my-skills",
-      "description": "Personal skill bundle: EN-VI translation, Vietnamese tech writing, Vietnamese concept explainer.",
+      "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer.",
       "source": "./plugins/my-skills",
       "category": "productivity"
     },
