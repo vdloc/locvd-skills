@@ -1,8 +1,17 @@
 {
   "name": "my-skills",
-  "version": "0.3.0",
-  "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer.",
+  "version": "0.4.0",
+  "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer, prompt language normalization.",
   "author": {
     "name": "locvd"
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/normalize-prompt.js\"", "timeout": 5 }
+        ]
+      }
+    ]
   }
 }
