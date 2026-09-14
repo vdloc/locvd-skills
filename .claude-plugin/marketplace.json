@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "my-skills",
-      "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer.",
+      "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer, UI/UX audit playbook, 3D realism audit.",
       "source": "./plugins/my-skills",
       "category": "productivity"
     },
