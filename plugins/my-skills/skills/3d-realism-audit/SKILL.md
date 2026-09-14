@@ -1,18 +1,17 @@
 ---
 name: 3d-realism-audit
-description: Use when asked to audit, improve, or increase the photorealism of the three.js / react-three-fiber scene in courtier-console-v2 — review lighting, materials, color management, shadows, AO, reflections, post-processing, anti-aliasing, or geometry detail and produce a prioritized punch list of concrete code changes. Grounded in the repo research doc plus Real-Time Rendering 3e and Physically Based Rendering 3e reference notes.
+description: Use when asked to audit, improve, or increase the photorealism of the three.js / react-three-fiber scene in a web project — review lighting, materials, color management, shadows, AO, reflections, post-processing, anti-aliasing, or geometry detail and produce a prioritized punch list of concrete code changes. Grounded in the repo research doc plus Real-Time Rendering 3e and Physically Based Rendering 3e reference notes.
 ---
 
-# 3D realism audit — courtier-console-v2
+# 3D realism audit — three.js / R3F project
 
 Audit real three.js / `@react-three/fiber` scene in repo against current (2024–2025) real-time-rendering best practice. Output: prioritized, file:line-grounded punch list of concrete code changes.
 
-**Every "why" behind recommendation lives in
-`/home/vdloc/Projects/courtier-console-v2/docs/RESEARCH-3D-REALISM.md`.**
+**Every "why" behind recommendation lives in the project's own 3D research doc**
+(`docs/RESEARCH-3D-REALISM.md` in repos that have one; no such doc → cite the reference notes below instead).
 Skill cites file by section number (`§4`, `§11.2b`, etc.), no re-arguing rendering theory — but pitfall catalog not citation-only: Step 2.5 duplicates wrong/fixed code pattern for every pitfall inline, so audit pattern-matches `src/` without second file open. Research file missing something you find → add it there first (with primary-source citation), then reference here. No unsourced advice in audit output.
 
-**Second source layer — textbook references** in
-`/home/vdloc/.claude/skills/3d-realism-audit/references/`, distilled from *Real-Time Rendering* 3rd ed. (Akenine-Möller, Haines, Hoffman — "RTR3") and *Physically Based Rendering* 3rd ed. (Pharr, Jakob, Humphreys — "PBRT3"). Supply theory, numeric ranges (F0/albedo tables, tone-mapping key, bias/cascade rules, batch budgets) and extra pitfalls **P-B.\*** in Step 2.5. Cite as `ref-0N (RTR3 §x.y)`. Count as primary sources for "no unsourced advice" rule, two limits: lines marked *three.js mapping* not from books — verify against installed three.js before quoting; both books predate AgX/ACES, WebGPU/TSL, modern WebGL batching numbers — use for principles and ranges, research doc for current three.js APIs.
+**Second source layer — textbook references** in this skill's `references/` directory, distilled from *Real-Time Rendering* 3rd ed. (Akenine-Möller, Haines, Hoffman — "RTR3") and *Physically Based Rendering* 3rd ed. (Pharr, Jakob, Humphreys — "PBRT3"). Supply theory, numeric ranges (F0/albedo tables, tone-mapping key, bias/cascade rules, batch budgets) and extra pitfalls **P-B.\*** in Step 2.5. Cite as `ref-0N (RTR3 §x.y)`. Count as primary sources for "no unsourced advice" rule, two limits: lines marked *three.js mapping* not from books — verify against installed three.js before quoting; both books predate AgX/ACES, WebGPU/TSL, modern WebGL batching numbers — use for principles and ranges, research doc for current three.js APIs.
 
 | Ref | Covers | Serves |
 |---|---|---|
@@ -64,10 +63,10 @@ grep -rn "InstancedMesh\|<Instances\|<Detailed" src/
 ```
 
 Read full current contents of:
-- `/home/vdloc/Projects/courtier-console-v2/src/diagram/DiagramScene.tsx` (materials, camera, canvas config — nearly every finding below grounded here)
-- `/home/vdloc/Projects/courtier-console-v2/src/diagram/palette.ts` (color source — CSS custom properties, not hardcoded hex; matters for §2 below)
-- `/home/vdloc/Projects/courtier-console-v2/src/app/Viewport.tsx` (overlay/stats — confirms nothing else touches renderer)
-- `/home/vdloc/Projects/courtier-console-v2/src/store/viewSlice.ts` and `/home/vdloc/Projects/courtier-console-v2/src/store/types.ts` (`mode`/`quality`/`Quality` state — `quality` currently write-only per `docs/CHECKLIST.md` §2.4; natural hook for device-tier fidelity gate, §9 below)
+- the scene root, e.g. `src/diagram/DiagramScene.tsx` (materials, camera, canvas config — nearly every finding below grounded here)
+- the color source, e.g. `src/diagram/palette.ts` (color source — CSS custom properties, not hardcoded hex; matters for §2 below)
+- the canvas host, e.g. `src/app/Viewport.tsx` (overlay/stats — confirms nothing else touches renderer)
+- the view state, e.g. `src/store/viewSlice.ts` and `src/store/types.ts` (`mode`/`quality`/`Quality` state — a `quality` value that is written but never read is a natural hook for device-tier fidelity gate, §9 below)
 
 **Two baselines exist — check which branch first**
 (`ls src/diagram/realistic/`):
@@ -348,7 +347,7 @@ Step 2 checks "is feature present." This step checks "is feature — present or 
 
 ### Book-derived pitfalls (P-B.*, from references/ — RTR3 / PBRT3)
 
-Same rules: run every entry, report every verdict. No research-doc `§` yet — cite ref file; if one becomes punch-list item, also add to research §11 so catalogs don't drift. Run every grep after `cd /home/vdloc/Projects/courtier-console-v2` (or active worktree root); widen `src/` if realistic-mode code lives elsewhere. "Verify" entries need value read or screenshot, not just grep hit.
+Same rules: run every entry, report every verdict. No research-doc `§` yet — cite ref file; if one becomes punch-list item, also add to research §11 so catalogs don't drift. Run every grep from the repo root (or active worktree root); widen `src/` if realistic-mode code lives elsewhere. "Verify" entries need value read or screenshot, not just grep hit.
 
 **Materials (ref-02, ref-03)**
 - **P-B.1** metal F0 out of physical range. Read: every material with `metalness` ≥ 0.9 (GLB materials: `__gl.scene.traverse` in DEV). Applies: once any metal exists. WRONG: `metalness 1` with linear `color` < 0.5 or pure white. FIXED: color from RTR3 T7.4 (steel/iron ≈ 0.56 linear, aluminum ≈ 0.91).
