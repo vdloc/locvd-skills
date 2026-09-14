@@ -54,6 +54,9 @@ Consistency at scale comes from a system: tokens (colour, type, spacing, radius,
 | S10 | Empty/loading/error | Present for every data-driven component | RUI, TID |
 | S11 | Documentation | Usage guidelines + editorial rules exist and match implementation | PUI, WSG |
 | S12 | Framework fit | UI kit customised to brand; conventions preserved; no ugly defaults for rare elements | TID, WSG |
+| S13 | Panel section order is frequency-ranked | When a docked panel stacks multiple sections (tools, settings, metadata) with equal visual weight, high-frequency actions sit above low-frequency/set-once ones — not in build/chronological order | (derived; not in source books) |
+| S14 | No orphaned duplicate state | The same fact (mode, selection, status) isn't rendered in two disconnected places with different visual language and no link between them; if shown twice, one is clearly the control and the other visibly refers to it | (derived; not in source books) |
+| S15 | Disclosure pattern applied symmetrically | Siblings doing a structurally similar job (both are "contextual tools bound to viewport/selection state") get the same show/hide and collapse-to-overlay treatment; if one panel earned progressive disclosure and a sibling doing the same kind of job didn't, treat the asymmetry itself as the defect, not just its symptoms | (derived; not in source books) |
 
 ## Fix Recipes
 ```css
@@ -96,6 +99,9 @@ Consistency at scale comes from a system: tokens (colour, type, spacing, radius,
 - **Double-row tabs**; colour-only selected tab [TID].
 - **Fake urgency/scarcity** in pricing [KUL].
 - **Critical info only in tooltips** [PUI][WSG].
+- **Panel sections stacked in build order, not use-frequency order** — a "settings" section outranking "tools" just because it was added first; the fix is usually a reorder, not new code, and it's cheap enough to do before a deeper structural fix lands (derived).
+- **Same fact shown twice with no visual link** — e.g. a mode/status echoed as a read-only chip somewhere far from the control that actually sets it; harmless alone, but a tell that the two surfaces were built independently and will drift (derived).
+- **One of two structurally similar panels gets progressive disclosure, the other doesn't** — the region that never collapses/hides is usually also the one that turns out fragile under space pressure (unbounded flex-grow, no floor on the low-priority sibling — see ch03 L13); the missing disclosure pattern is the root cause, the layout bug is the symptom (derived).
 
 ## Worked Example
 *Pricing section [PUI + KUL]:* Three tiers $10/$20/$30 per month looked identical. Fix: middle tier slightly larger, higher-contrast 2px border, deeper shadow, filled primary "Choose Pro" while others get secondary buttons, "Most popular" badge; an "Pay annually and save 10%" toggle switch updates prices immediately; features aligned row-by-row with tooltips for jargon; sticky plan names/prices header in the long comparison table; testimonial + "Join 50,000+ designers" social proof above; genuine money-back guarantee note under CTAs.

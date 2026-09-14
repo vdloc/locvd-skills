@@ -49,6 +49,7 @@ Space is a design material: a constrained, non-linear spacing scale plus the rul
 | L10 | White space sufficient | Squint test shows distinct groups; nothing collides with edges | PUI, TID |
 | L11 | Critical content early | Primary content/CTA visible in first viewport zone; no "layer cake" of logos/ads on mobile | WSG, TID |
 | L12 | Touch spacing | ≥8pt between adjacent targets (16pt safe) | PUI |
+| L13 | Split-pane ratio safe | In any flex/grid region with an unbounded-growth sibling (`flex-grow`/`fr` with no cap) next to a fixed-purpose sibling (controls, actions, tools), check both at a short/constrained container size: does the growth sibling stop at a sane cap, and does the fixed sibling keep a floor + visible scroll affordance instead of being pushed off-screen? Test at the shortest realistic window height, not just narrow width. | (derived; not in source books) |
 
 ## Fix Recipes
 1. **Define scale tokens** (pick one and stick to it):
@@ -72,6 +73,16 @@ Space is a design material: a constrained, non-linear spacing scale plus the rul
 6. **Card too narrow at mid breakpoints** → `width: 100%; max-width: 500px` instead of column spans [RUI].
 7. **Mixed alignment** → left-align all; if centred for short content, make the button full-width on mobile [PUI].
 8. **Overflow hiding data** → allow wrap/reflow; middle-truncate with full text in tooltip/title.
+9. **One flex sibling starves another at short heights** → don't give one region `flex: 1 1 auto` with only a `min-height` floor while its sibling is `flex: 0 1 auto; min-height: 0` (shrink-only, no floor) — the floored sibling freezes at its minimum and *all* remaining squeeze lands on the floorless one, silently, with no scrollbar cue until it's already gone. Either cap the growing region (`max-height`, or `flex: 0 1 <content-based-basis>` instead of unbounded grow), or give the fixed-purpose sibling its own `min-height` floor sized to its most‑used control (e.g. the first tool row), or split the parent into two independently scrolling regions so neither can zero out the other:
+```css
+/* before: tree can eat every pixel below its 200px floor */
+.tree { flex: 1 1 auto; min-height: 200px; overflow-y: auto; }
+.tools { flex: 0 1 auto; min-height: 0; overflow-y: auto; } /* no floor — starves first */
+
+/* after: tools gets a floor sized to its content, tree yields to it */
+.tree { flex: 1 1 auto; min-height: 120px; overflow-y: auto; }
+.tools { flex: 0 0 auto; min-height: 180px; overflow-y: auto; } /* protected */
+```
 
 ## Conflicts & Context
 - 12-col grid [PUI][KUL][TID][WSG] vs "grids are overrated" [RUI] — not a real conflict: grids organise page regions; components get intrinsic/max widths.

@@ -13,6 +13,7 @@ Load tools first if deferred (`ToolSearch select:mcp__playwright__browser_naviga
 | 4 | `mcp__playwright__browser_evaluate` | metrics snippet below (type, colour, targets, spacing) |
 | 5 | `mcp__playwright__browser_press_key` Tab ×N + screenshot | focus order + focus-visible ring (A1, A2) |
 | 6 | `mcp__playwright__browser_evaluate` `document.body.style.zoom='2'` or resize 640 @1280 | reflow / horizontal scroll (A11) |
+| 6b | `browser_resize` to the shortest realistic window height (e.g. 1280×600 — laptop with browser chrome) + screenshot | split-pane starvation: a `flex-grow` region eating a fixed-purpose sibling (tools/actions) down to invisible — see ch03 L13. Width-only breakpoint testing (step 2) never catches this. |
 | 7 | `mcp__playwright__browser_console_messages` | runtime errors, a11y warnings |
 | 8 | axe (if allowed): inject `https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js` via evaluate, run `axe.run()` | WCAG violations with selectors |
 

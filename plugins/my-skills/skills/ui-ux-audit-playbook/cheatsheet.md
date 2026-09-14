@@ -55,6 +55,9 @@
 - **Mobile nav?** 3–5 destinations → labelled bottom tab bar; more → menu + clear current location. [TID][WSG]
 - **Icon alone?** Only universal (search, close, menu) + accessible name; otherwise add label. [TID][PUI]
 - **Custom widget?** Native element restyled › ARIA APG pattern › custom (must be focusable, keyboard, named, stateful, contrast, forced-colors). [WSG]
+- **Multiple panel sections, same visual weight?** Order by use-frequency, not build order — tools/actions used every session outrank settings/metadata set once. [ch12 S13]
+- **Same fact rendered in two places?** One must be the control, the other a visible reference to it (position, style, or explicit link) — not two independent read-outs that can drift. [ch12 S14]
+- **Two panels doing a structurally similar job?** Give both the same disclosure treatment (mount-on-demand + collapse-to-overlay); an asymmetry there is usually why only one of them turns out fragile under space pressure. [ch12 S15, ch03 L13]
 
 ## Trade-off matrix: validation timing [PUI]
 | Approach | Feedback speed | Build cost | Risk |
@@ -84,3 +87,4 @@
 - Mixed filled + outline icons → inconsistent icon semantics (ch07)
 - Carousel autoplay / video autoplay → loss of user control (ch07)
 - Empty table shows just "No data" → missed onboarding (ch06)
+- Sibling panel has `flex-grow` + only a `min-height` floor next to a `flex: 0 1 auto; min-height: 0` sibling → the floorless one gets starved to zero at short window heights, tools/actions vanish below the fold with no scroll cue — only shows up when you actually shrink the window (ch03 L13)

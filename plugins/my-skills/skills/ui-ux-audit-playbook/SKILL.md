@@ -97,7 +97,7 @@ Scope · Users & tasks · Method (tools, breakpoints) · Standard (WCAG 2.2 AA +
 | [ch09](chapters/ch09-forms-input.md) | Forms & validation | single column, labels, control choice, validation approaches |
 | [ch10](chapters/ch10-navigation-ia.md) | Navigation & IA | MECE, LATCH, card sorting, signposts, scent, search |
 | [ch11](chapters/ch11-lists-tables-data.md) | Lists, tables, data | split view/drilldown/inlay, pagination, preattentive encoding, dashboards |
-| [ch12](chapters/ch12-components-design-systems.md) | Components & design systems | tokens, atomic design, cards, modals, dropdowns, hero, pricing |
+| [ch12](chapters/ch12-components-design-systems.md) | Components & design systems | tokens, atomic design, cards, modals, dropdowns, hero, pricing, panel section ordering, disclosure symmetry |
 | [ch13](chapters/ch13-copywriting-content.md) | Copywriting & content | concise, front-load, inverted pyramid, link & error copy |
 | [ch14](chapters/ch14-mobile-responsive.md) | Mobile & responsive | mobile-first, thumb zone, vertical stack, responsive web design |
 | [ch15](chapters/ch15-accessibility-semantics.md) | Accessibility & semantics | native first, keyboard/focus, landmarks, reflow, ARIA checklist |
