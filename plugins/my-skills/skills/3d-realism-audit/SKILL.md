@@ -5,7 +5,7 @@ description: Use when asked to audit, improve, or increase the photorealism of t
 
 # 3D realism audit — three.js / R3F project
 
-Audit real three.js / `@react-three/fiber` scene in repo against current (2024–2025) real-time-rendering best practice. Output: prioritized, file:line-grounded punch list of concrete code changes.
+Audit real three.js / `@react-three/fiber` scene in repo against current (2024–2026) real-time-rendering best practice — including the r3f v9 color-management/async-renderer changes, post-r155 lighting defaults, and the emerging WebGPU/TSL path (see P-11.9d). Output: prioritized, file:line-grounded punch list of concrete code changes, each with a falsifiable acceptance rule (see Step 3).
 
 **Every "why" behind recommendation lives in the project's own 3D research doc**
 (`docs/RESEARCH-3D-REALISM.md` in repos that have one; no such doc → cite the reference notes below instead).
@@ -54,6 +54,16 @@ grep -rn "directionalLight\|pointLight\|spotLight\|ambientLight\|hemisphereLight
 # Renderer config — color management, tone mapping, shadows
 grep -rn "outputColorSpace\|toneMapping\|shadowMap\|antialias\|dpr=" src/
 
+# Legacy-lighting guard — must NOT reappear on three>=0.155 (r155 flipped useLegacyLights default to false)
+grep -rn "useLegacyLights\|physicallyCorrectLights" src/
+
+# Custom shaders/materials — r3f v9 removed automatic texture sRGB conversion for these;
+# built-in materials (meshStandardMaterial etc.) still auto-handle it, custom ones don't
+grep -rn "ShaderMaterial\|onBeforeCompile\|RawShaderMaterial" src/
+
+# Stack versions — pin and check compatibility, don't assume
+grep -n '"three"\|"@react-three/fiber"\|"react"\|"@react-three/postprocessing"' package.json
+
 # Post-processing — does the package even exist?
 grep -n "postprocessing" package.json
 grep -rn "EffectComposer\|<Bloom\|<SSAO\|<Vignette" src/
@@ -99,6 +109,8 @@ onCreated={({ gl }) => {
 }}
 ```
 Callback destructures `{ gl }` — does **not** receive or stash full r3f `state`, and no `window.__r3f` handle in repo. Step 4 programmatic verification needs one; see Step 4 for dev-only line adding it. Don't write snippet here assuming it exists.
+- **r3f v9 note**: built-in materials (`meshStandardMaterial`, `meshBasicMaterial`, etc.) auto-handle color-texture sRGB conversion same as vanilla three.js — no action needed there. But r3f v9 **removed** automatic conversion for custom materials/shaders: any `<shaderMaterial>`/`onBeforeCompile`/`RawShaderMaterial` consuming a color texture must set `texture.colorSpace = THREE.SRGBColorSpace` explicitly (or the JSX `texture-colorSpace` prop), or colors render too dark. Only relevant once a custom shader exists — n/a on stock materials.
+- **Accept**: `renderer.outputColorSpace === THREE.SRGBColorSpace` read from live `__gl.gl` handle (Step 4a), AND every `ShaderMaterial`/`RawShaderMaterial` texture uniform has `.colorSpace` set (grep `ShaderMaterial` → for each hit, confirm paired `.colorSpace =` within same file). Fail = either check false.
 - **Impact**: low today (unlit hex colors, little visible difference) but prerequisite for every material/lighting change below — set now so not silent variable when `MeshStandardMaterial`/textures/lights introduced. Research §11.1a warns against leaving implicit and later mixing older-API snippets.
 
 ### 2.2 Lighting model & IBL
@@ -188,6 +200,8 @@ Add bias-tuned key light per research §11.4a-b, not three.js defaults:
   shadow-mapSize={[2048, 2048]}
 />
 ```
+- **Shadow softness tuning**: `shadow-radius` (e.g. `<directionalLight shadow-radius={10} ...>`) controls shadow-edge blur specifically under `VSMShadowMap` — has no effect under `PCFSoftShadowMap`/`PCFShadowMap`. If softness is the goal, pair `shadow-radius` with `shadows="variance"` (VSM), not `"soft"` (PCF) — the two are different shadow algorithms, not the same knob at different strengths.
+- **Accept**: `castShadow`/`receiveShadow` present on ground + at least one structural mesh (grep, Step 1); `shadow-bias`/`shadow-normalBias` non-default (not `0`/three.js default `-0.0001`); `__gl.gl.info.render.calls` before vs after enabling shadows recorded in Step 4b (shadow pass roughly doubles calls — expected, not a bug, but must be stated). Fail = shadow prop present but frustum/bias still at three.js defaults (P-11.4a/b still `Applies: now`).
 - **Impact**: medium-high once lighting (2.2) exists; zero before.
 
 ### 2.5 Ambient occlusion
@@ -212,6 +226,13 @@ import { EffectComposer, SSAO } from '@react-three/postprocessing';
 - **Good**: research §4 (IBL as default), §11.5d (SSR experimental/thin-geometry-unsafe — don't default). For steel-frame model with pipes (`kind: 'pipe'`, rendered as `service` role, opaque per `palette.ts`'s `ROLE_BY_KIND`), IBL-only reflection via `<Environment>` is correct default; SSR breaks on thin pipe geometry per §11.5d.
 - **Book**: ref-04 (RTR3 §8.4–8.5) and ref-05 (RTR3 §9.3) — prefiltered env mips per roughness; radially symmetric prefiltering wrong on flat floors at grazing views; planar reflections need clip plane + stencil. P-B.14.
 - **Impact**: low priority vs 2.2/2.4 — reflections read correctly for free once `<Environment>` + `MeshStandardMaterial` land.
+
+### 2.6b Volumetric lighting / god rays (optional, cost-gated)
+
+- **Detect**: `grep -rn "Volumetric\|godrays\|GodRays\|raymarch" src/`. Applies only if scene has an occluder silhouette worth shafting light through (dense lattice/frame — this stack's typical subject) and a directional key light from 2.4.
+- **Good**: implement as a **screen-space post-processing Effect** (extend `postprocessing`'s `Effect` class with `EffectAttribute.DEPTH`), raymarching against the reconstructed depth buffer — cost is then decoupled from scene geometric complexity (flat regardless of mesh count), unlike a geometry-based volume. For shadow-consistent shafts (light correctly occluded by structure, not just by depth), render a small dedicated shadow/depth texture (~256×256) from the light's view and sample it during the raymarch for occlusion, rather than trusting the main shadow map's resolution/frustum.
+- **Accept**: effect's cost measured via 4b (`__gl.gl.info.render.calls`/frame time) does **not** scale with `triangles` count when toggled on/off at fixed geometry — if it does, it's not screen-space and the "Good" criterion above is violated. Shaft direction must visually match the 2.4 key light's `position` (side-by-side screenshot, not assumed).
+- **Impact**: low — pure atmosphere polish, sequence last, after 2.2/2.4/2.7; skip entirely unless scene has a light-through-lattice moment worth the extra pass.
 
 ### 2.7 Post-processing / bloom / exposure
 
@@ -281,13 +302,14 @@ Step 2 checks "is feature present." This step checks "is feature — present or 
 - **P-11.1a** double gamma correction. Grep: `grep -rn "outputEncoding\|sRGBEncoding\|\.encoding = " src/`. Applies: n/a today (no such calls; `outputColorSpace` not set yet — see 2.1). WRONG: `texture.encoding = THREE.sRGBEncoding; renderer.outputEncoding = THREE.sRGBEncoding;` FIXED: `texture.colorSpace = THREE.SRGBColorSpace; renderer.outputColorSpace = THREE.SRGBColorSpace;` (set once, one place).
 - **P-11.1b** data map tagged sRGB. Grep: `grep -rn "\.colorSpace" src/` (currently zero — no textures loaded in `src/diagram/`). Applies: n/a until any `normalMap`/`roughnessMap`/`aoMap` introduced. WRONG: `normalMap.colorSpace = THREE.SRGBColorSpace;` FIXED: `normalMap.colorSpace = THREE.NoColorSpace;` (only color map gets `SRGBColorSpace`).
 - **P-11.1c** inconsistent per-material tone-mapping opt-out. Grep: `grep -rn "toneMapped" src/`. Applies: n/a today (no HUD material inside `<Canvas>` — `Viewport.tsx`'s `Chip` overlay is DOM sibling, not Three.js material, sidestepping this). WRONG: future in-canvas HUD mesh's `toneMapped` unset while scene has tone mapping. FIXED: `hudMaterial.toneMapped = false;` on any such mesh.
+- **P-11.1d** custom shader missing texture colorSpace under r3f v9. Grep: `grep -rn "ShaderMaterial\|onBeforeCompile\|RawShaderMaterial" src/`. Applies: n/a on stock materials (`meshStandardMaterial` etc. still auto-convert); live once any custom shader consumes a color texture — r3f v9 dropped automatic sRGB conversion there. WRONG: `<shaderMaterial uniforms={{ map: { value: colorTex } }} />` with `colorTex.colorSpace` left at default (`NoColorSpace`). FIXED: `colorTex.colorSpace = THREE.SRGBColorSpace;` set once on load, before passing as uniform.
 
 ### Lighting / IBL (research §11.2)
 
 - **P-11.2a** too many shadow-casting lights. Grep: `grep -rn "castShadow" src/`. Applies: n/a — zero lights (see 2.2). Once added: WRONG: `{lights.map((l) => <pointLight key={l.id} castShadow position={l.pos} />)}` (many casters). FIXED: one `<directionalLight castShadow>` key light + `<Environment>` for ambient fill.
 - **P-11.2b** missing environment map. Grep: `grep -rn "<Environment" src/` (currently zero). Applies: now — live gap, not future risk; see 2.2/2.6. WRONG: `<meshStandardMaterial metalness={1} />` with no `scene.environment`. FIXED: add `<Environment preset="city" />` as sibling of `<Model />`.
 - **P-11.2c** environment intensity vs. exposure mismatch. Grep: `grep -rn "environmentIntensity\|toneMappingExposure" src/`. Applies: n/a until both exist. WRONG: tuning `environmentIntensity` alone after `toneMappingExposure` change. FIXED: re-check both together against known-material reference whenever either changes.
-- **P-11.2d** stale physically-correct light-unit assumptions. Grep: `grep -rn "useLegacyLights\|physicallyCorrectLights" src/` (should stay zero — repo's `three@^0.169.0` predates property's removal window; must not be reintroduced). Applies: now, as guard — confirm no future PR reintroduces it, and any new light's `intensity`/`decay` tuned empirically, not copied from pre-r155 tutorial. WRONG: `new THREE.PointLight(0xffffff, 1, 100, 1)` copied from old example with `decay: 1`. FIXED: `new THREE.PointLight(0xffffff, intensity, 100, 2)` — `decay: 2`, intensity re-tuned against current renderer, not ported.
+- **P-11.2d** stale physically-correct light-unit assumptions. Grep: `grep -rn "useLegacyLights\|physicallyCorrectLights" src/` (should stay zero — three.js r155+ flipped `WebGLRenderer.useLegacyLights` default to `false` and removed the legacy path entirely in later releases; on any three.js at or past that line, reintroducing either flag is a regression, not a fix). Applies: now, as guard — confirm no future PR reintroduces it, and any new light's `intensity`/`decay` tuned empirically against the current (non-legacy) falloff, not copied from a pre-r155 tutorial or example. WRONG: `new THREE.PointLight(0xffffff, 1, 100, 1)` copied from old example with `decay: 1`. FIXED: `new THREE.PointLight(0xffffff, intensity, 100, 2)` — `decay: 2`, intensity re-tuned against current renderer, not ported. **Accept**: grep returns zero hits AND installed `three` version confirmed ≥0.155 (check `package.json`) — both conditions, not either alone.
 - **P-11.2e** baked vs. real-time shadow conflict. Grep: `grep -rn "AccumulativeShadows\|RandomizedLight" src/` (currently zero). Applies: n/a until adopted. WRONG: baking `AccumulativeShadows` under moving/`exploded` part. FIXED: baked shadow-catchers for static scenery only; timeline/explode-animated parts (repo has both, via `progress` and `exploded` in `viewSlice.ts`) get real-time shadow.
 - **P-11.2f** light leaking through thin/open geometry. Grep: `grep -n "size:" src/diagram/model.ts | head` — check near-zero dimension in `Part.size`. Applies: n/a until shadows exist; re-check once 2.4 lands, since `model.ts` generated boxes could include thin plate. WRONG: `shadow.camera.near = 5` when occluder sits closer than 5 units to light. FIXED: `shadow.camera.near` small enough to include closest occluder, tightened with `far` (see P-11.4b).
 
@@ -336,13 +358,14 @@ Step 2 checks "is feature present." This step checks "is feature — present or 
 - **P-11.8c** asset loading outside Suspense/`useLoader`. Grep: `grep -rn "TextureLoader\|useLoader\|Suspense" src/` (n/a — no assets loaded; model procedurally generated in `model.ts`). Applies: n/a until texture/GLB load introduced.
 - **P-11.8d** `<Environment>` reloading on remount. Grep: `grep -n "mode ===" src/diagram/DiagramScene.tsx` — confirm `<Environment>` (once added, P-11.2b) is sibling of, not nested inside, any `{mode === 'realistic' && ...}` block, since remount on every mode switch re-triggers HDRI load. Applies: check when 2.2/2.9 implemented, not before. WRONG: `{realistic && <><Environment preset="city" /><Model /></>}`. FIXED: `<Environment preset="city" />` always mounted; `Model`'s *material choice* (not environment's mount state) branches on `realistic`.
 - **P-11.8e** `setState`/store-`set()` inside `useFrame`. Grep: `grep -n "useFrame" src/diagram/DiagramScene.tsx` — `CameraRig`'s `useFrame` (~line 149) mutates `camera.position`/`controls.target` directly, calls no store setter in loop. Applies: **already correct — protect pattern**, don't regress. WRONG (hypothetical future): `useFrame(() => { setCameraPosition(camera.position); })`. FIXED (existing pattern to keep): `useFrame(() => { camera.position.copy(computed); controls.update(); })`.
+- **P-11.8f** `@react-three/fiber` version behind installed React. Grep: `grep -n '"react"\|"@react-three/fiber"' package.json`. Applies: now — check every audit, since a React major bump can silently outrun the pinned r3f version. WRONG: React `^19.2.0` with `@react-three/fiber` `<9.5.0` (v9.5.0 is the version that added its own reconciler for React 19.0–19.2, including the `Activity` feature — earlier v9.x targets narrower React ranges). FIXED: bump `@react-three/fiber` to ≥9.5.0 before or alongside any React 19.2 upgrade; re-run this whole audit after (a renderer major bump can shift default behaviors covered elsewhere in this file). **Accept**: `package.json` `@react-three/fiber` semver satisfies the installed `react` major/minor per the pmndrs release notes for that r3f version — don't assume compatibility, read the release notes for the exact pinned version.
 
 ### Rare/subtle (research §11.9)
 
 - **P-11.9a** glTF Y-up/unit mismatch. Grep: `grep -rn "GLTFLoader\|\.gltf\|\.glb" src/` (n/a — `docs/CHECKLIST.md` §3 notes model still procedurally generated, not GLB-loaded). Applies: n/a today; re-run if/when CHECKLIST's open "generated vs. GLB" decision (§3) resolved toward GLB.
 - **P-11.9b** `KHR_materials_emissive_strength` / clamped emissive. Grep: `grep -rn "emissive" src/` (n/a — no emissive materials). Applies: n/a until emissive part (e.g. lit fixture) added; if bloom (2.7) also added, plain `emissiveIntensity` must exceed `1.0` to register against `luminanceThreshold` of `1.0`.
 - **P-11.9c** z-fighting at large world coordinates. Applies: n/a — model spans tens of metres (`BAY_X = 7.2`, 4×3 bays); revisit only at geo-referenced coordinate scale.
-- **P-11.9d** WebGPU/TSL parity gaps. Applies: n/a — plain `WebGLRenderer` path. TSL/WebGPU migration (research §10) **out of scope for this audit**; if proposed, hand off as own initiative, not punch-list item.
+- **P-11.9d** WebGPU/TSL parity gaps. Grep: `grep -rn "WebGPURenderer\|WebGPU\|three/tsl\|from 'three/webgpu'" src/`. Applies: n/a while on plain `WebGLRenderer` path — stays out of scope for this audit *as a migration target*, hand off as own initiative if proposed. **Becomes in-scope the moment `grep` above returns a hit** (someone started the migration): confirm (1) `Canvas`'s `gl` prop is an async factory (`gl={async (props) => { const r = new THREE.WebGPURenderer(props); await r.init(); return r; }}` — this is the documented r3f v9 pattern, not a sync renderer instance) and (2) every Step 2/2.5 rule in this file still applies to the WebGPU path (most do — color management, shadow bias, AO cost — but re-verify each, don't assume WebGL findings port silently). As of this writing (Sep 2026) r3f's WebGPU/TSL support is a v10 **alpha** line (also adding multi-canvas GPU-context sharing and a standalone `useFrame` scheduler) — treat any WebGPU punch-list item as experimental-track, not main-track, until v10 stabilizes. No specific three.js version is a confirmed "WebGPU-ready" gate — don't cite one.
 - **P-11.9e** 8-bit render-target banding. Grep: `grep -rn "HalfFloatType\|dithering" src/` (n/a — no render targets/composer yet). Applies: once 2.5/2.7 introduce `EffectComposer` — check composer render-target `type` then. WRONG: default `UnsignedByteType` composer target under bloom. FIXED: `new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType })`, or `material.dithering = true` as cheaper fallback.
 
 ### Book-derived pitfalls (P-B.*, from references/ — RTR3 / PBRT3)
@@ -357,6 +380,7 @@ Same rules: run every entry, report every verdict. No research-doc `§` yet — 
 - **P-B.5** colored specular on insulator. Grep: `grep -rn "specularColor\|specularIntensity" src/`. Applies: n/a until `MeshPhysicalMaterial` specular props used. WRONG: tinted `specularColor` on plastic/paint/concrete. FIXED: leave white; color in albedo (RTR3 §7.5.2).
 - **P-B.10** normal-map tangent handedness on mirrored UVs. Verify: raking light across mirrored part — relief inverts on one half. Applies: once normal maps on mirrored UVs exist. FIXED: export tangents with w sign (glTF `TANGENT` vec4) or recompute (RTR3 §6.7).
 - **P-B.11** compression format vs data type. Grep: `grep -rn "KTX2Loader\|\.ktx2\|basis" src/ public/`. Applies: once KTX2 adopted. WRONG: normal maps in ETC1S/color formats. FIXED: UASTC (or BC5-style 2-channel) for normals, ETC1S for color (RTR3 §6.2.6).
+- **P-B.29** stale three.js version misses recent PBR fixes. Grep: `grep -n '"three"' package.json`. Applies: now, every audit — three.js is actively revising physical accuracy (e.g. r186, Sep 2026, improved energy conservation in diffuse and sheen lighting calculations; a genuine physical-correctness delta, not cosmetic). WRONG: pinning `three` far below current and assuming material appearance is version-independent. FIXED: no forced upgrade mandated by this rule alone, but note installed version in the audit report and flag if >2 minor versions behind current three.js release — a stale pin silently ages every F0/albedo/roughness value checked elsewhere in this file. **Accept**: `package.json` three.js version recorded in audit output; if audit finds material-appearance discrepancy vs P-B.1–P-B.5 that isn't explained by scene code, check changelog for the installed version before concluding the scene code is wrong.
 
 **Color pipeline (ref-01, ref-07)**
 - **P-B.6** effect after output encode. Grep: `grep -rn "OutputPass\|EffectComposer\|<EffectComposer" src/`. Applies: once composer exists. WRONG: any pass after output/encode pass, or bloom on 8-bit sRGB target. FIXED: output pass last; effects on linear half-float targets (RTR3 §5.8).
@@ -408,8 +432,21 @@ Pitfall `Applies: n/a` is **not** punch-list item at any priority — report in 
   Now:   <what's actually there today, quoted>
   Change: <concrete diff-shaped snippet, using this repo's actual imports/names>
   Why: docs/RESEARCH-3D-REALISM.md §<n> and/or ref-0N (RTR3|PBRT3 §x.y) — <one-clause reason>
+  Accept: <falsifiable pass/fail rule that proves the change landed and works — see rule types below>
   Depends on: <other punch-list item, if sequencing matters — e.g. "2.4 shadows depends on 2.2 lighting">
 ```
+
+**`Accept:` is mandatory, not optional narration.** It must be checkable by someone who didn't write the code, without re-reading this skill's reasoning. Every item's dimension in Step 2/2.5 above already models one; pick the matching rule type rather than inventing a new shape each time:
+
+| Rule type | Form | Example |
+|---|---|---|
+| **Config/prop check** | `<expr> === <expected value>`, read from live renderer/material, not source guess | `renderer.outputColorSpace === THREE.SRGBColorSpace` (2.1) |
+| **Grep-absence/presence** | pattern must (not) match, stated as the exact command | `grep -rn "useLegacyLights" src/` returns zero hits (P-11.2d) |
+| **Measured threshold** | numeric value from Step 4b, with the pass boundary stated | effect cost flat vs `triangles` when toggled (2.6b) |
+| **Version/compat check** | installed semver satisfies a stated minimum, cite the source of the minimum | `@react-three/fiber` ≥9.5.0 for React 19.2 (P-11.8f) |
+| **Visual yes/no** | one specific 4c-style question, answerable from a screenshot, not "looks better" | shaft direction matches key light position (2.6b) |
+
+A punch-list item whose `Accept:` line reduces to "looks good" or "should work now" is not done — go back and find the config value, grep pattern, measured number, or specific screenshot comparison that would prove it.
 
 Order by dependency chain, not just impact — 2.2 (lighting + material swap) blocks nearly everything, so almost always `[HIGH]` #1 regardless, with 2.9 (mode/quality gating) right alongside so change ships as togglable feature, not silent behavior change to `engineering`/`analysis`/`construction` modes.
 
@@ -484,6 +521,7 @@ Any "no" → punch-list item with failing question quoted as `Now:` line.
 Loop has exit. Stop auditing, declare scene good enough when all hold:
 
 - Every Step 2.5 entry reads `Applies: n/a` or `already correct`.
+- Every open punch-list item's `Accept:` rule (Step 3) passes when re-checked, not just "implemented."
 - Every 4c question answers "yes".
 - Last two cycles produced only `[LOW]` items.
 - Frame time inside budget at target `quality` tier on weakest supported device.
