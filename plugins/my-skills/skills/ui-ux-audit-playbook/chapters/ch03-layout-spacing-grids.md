@@ -1,12 +1,13 @@
 # Ch 03: Layout, Spacing, Grouping & Grids
 
-Sources: [RUI] "Layout and Spacing" · [PUI] ch4 · [KUL] layouts/grids/box model · [TID] ch4 · [WSG] ch6, ch8
+Sources: [RUI] "Layout and Spacing" · [PUI] ch4 · [KUL] layouts/grids/box model · [TID] ch4 · [WSG] ch6, ch8 | **Derived sources** (not in the five books, see [research/form-page-layout-principles.md](../research/form-page-layout-principles.md) in ui-ux-audit-playbook): Chang/Dooley/Tuovinen Gestalt screen-design paper, NN/g proximity articles, WCAG 2.2 — marked "(derived; not in source books)" in Audit Checks below
 
 ## Core Idea
 Space is a design material: a constrained, non-linear spacing scale plus the rule "more space between groups than within them" produces order, grouping and hierarchy without extra boxes or lines.
 
 ## Frameworks Introduced
-- **Gestalt grouping** [PUI][TID][WSG]: *Common region* (same container — strongest, but cluttering if overused) · *Proximity* · *Similarity* (same look ⇒ same function; make one peer slightly different to highlight it) · *Continuity* (aligned lines; break it to end a group) · *Closure* · *Figure–ground* · *Uniform connectedness*.
+- **Gestalt grouping** [PUI][TID][WSG]: *Common region* (same container — strongest, but cluttering if overused) · *Proximity* · *Similarity* (same look ⇒ same function; make one peer slightly different to highlight it) · *Continuity* (aligned lines; break it to end a group) · *Closure* · *Figure–ground* · *Uniform connectedness*. Academic anchor: Chang, Dooley & Tuovinen (2002), *"Gestalt Theory in Visual Screen Design"* — this taxonomy already covers the subset relevant to UI grouping.
+- **Explanatory diagrams/illustrations belong in the same proximity group as what they explain** — an image clarifying a specific element (a diagram showing where a value is printed, an annotated screenshot, an icon key) must sit closer to that element than to any other page content; a separate "help panel" or FAQ section breaks proximity and forces users to search. This is proximity's ordinary rule applied to a non-text element, not a new principle — see ch09 for the forms-specific version (locatable-value diagrams).
 - **Avoid ambiguous spacing** [RUI]: whenever spacing connects elements, space *around* a group > space *within* it (label–input groups, headings need more space above than below, bullets vs line-height, horizontal chips).
 - **Start with too much white space, then remove** [RUI]; dense UIs (dashboards) only as a deliberate choice. **Be generous** — when unsure, take the next step up [PUI].
 - **Spacing/sizing system** [RUI]: not linear; adjacent values ≥ ~25% apart; base 16px; tight at small end. Example: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 640, 768.
@@ -48,8 +49,9 @@ Space is a design material: a constrained, non-linear spacing scale plus the rul
 | L9 | Unbreakable | Long strings, 0/1/1000 items, localisation (+30–40% text) don't break layout | PUI, TID |
 | L10 | White space sufficient | Squint test shows distinct groups; nothing collides with edges | PUI, TID |
 | L11 | Critical content early | Primary content/CTA visible in first viewport zone; no "layer cake" of logos/ads on mobile | WSG, TID |
-| L12 | Touch spacing | ≥8pt between adjacent targets (16pt safe) | PUI |
+| L12 | Touch spacing | ≥8pt between adjacent targets (16pt safe); each target itself ≥24×24 CSS px (WCAG 2.2 SC 2.5.8 Target Size Minimum), unless spaced so a 24px circle centred on it clears neighbours, an equivalent-size control exists elsewhere, or the target is inline text | PUI, WCAG SC 2.5.8 |
 | L13 | Split-pane ratio safe | In any flex/grid region with an unbounded-growth sibling (`flex-grow`/`fr` with no cap) next to a fixed-purpose sibling (controls, actions, tools), check both at a short/constrained container size: does the growth sibling stop at a sane cap, and does the fixed sibling keep a floor + visible scroll affordance instead of being pushed off-screen? Test at the shortest realistic window height, not just narrow width. | (derived; not in source books) |
+| L14 | Diagram proximity & reading order | An explanatory image/diagram sits within the visual proximity group of the element it explains (not a separate help panel); its DOM/reading order matches its visual adjacency, or an equivalent text alternative appears in sequence — check `browser_snapshot`'s accessibility-tree order against visual position, especially where CSS grid/flex `order` or absolute positioning could move it visually without moving it in the DOM | WCAG SC 1.3.2 (derived; not in source books) |
 
 ## Fix Recipes
 1. **Define scale tokens** (pick one and stick to it):
@@ -108,4 +110,4 @@ Space is a design material: a constrained, non-linear spacing scale plus the rul
 5. Design for the ugliest content, not the prettiest.
 
 ## Connects To
-- **ch02** spacing as emphasis · **ch14** responsive layouts · **ch06** borders vs spacing · **ch12** component padding tokens
+- **ch02** spacing as emphasis · **ch14** responsive layouts · **ch06** borders vs spacing · **ch12** component padding tokens · **ch09** FM16 forms-specific diagram-adjacency check · **ch15** accessibility (L12/L14 WCAG citations)

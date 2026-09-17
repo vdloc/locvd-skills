@@ -1,19 +1,22 @@
 # Ch 09: Forms, Inputs & Validation
 
-Sources: [PUI] ch8 · [TID] ch10 · [KUL] forms · [WSG] ch7 · [RUI] "Avoid ambiguous spacing"
+Sources: [PUI] ch8 · [TID] ch10 · [KUL] forms · [WSG] ch7 · [RUI] "Avoid ambiguous spacing" | **Derived sources** (not in the five books, see [research/form-page-layout-principles.md](../research/form-page-layout-principles.md)): Wroblewski/Penzo eye-tracking research, Baymard Institute field studies, NN/g articles, Apple HIG, Material Design 3, WCAG 2.2 — marked "(derived; not in source books)" in Audit Checks below
 
 ## Core Idea
 Forms are work you ask of users: ask for less, lay it out as one clear downward path, label everything visibly, choose the control that minimises effort for the data type, prevent errors before they happen, and when they do, say exactly what went wrong, where, and how to fix it.
 
 ## Frameworks Introduced
-- **Basics of form design** [TID]: respect time & attention; explain the purpose (why asked, how used, what they get); minimise inputs (derive city from postcode, card type from number); minimise clutter; group & title sections; show/hide long sections; strong vertical alignment; mark required vs optional consistently; descriptive labels + examples; field width previews input length; accept format variations; validate early and actionably; top-aligned labels for responsive; internationalise; confirm success + next step; usability-test forms.
+- **Basics of form design** [TID]: respect time & attention; explain the purpose (why asked, how used, what they get); minimise inputs (derive city from postcode, card type from number); minimise clutter; group & title sections; show/hide long sections; strong vertical alignment; mark required vs optional consistently; descriptive labels + examples; field width previews input length; accept format variations; validate early and actionably; top-aligned labels for responsive (**except mobile landscape** — Baymard's 18-site mobile study, `baymard.com/blog/mobile-form-usability-label-position`, found the on-screen keyboard consumes 67–82% of viewport height in landscape, so switch to left-aligned labels there to keep both label and input visible while typing); internationalise; confirm success + next step; usability-test forms.
 - **Single-column layout** [PUI]: consistent downward momentum, no missed fields (magnifier users); labels stacked *above* inputs (not left: zig-zag, jagged, wrapping); stack checkboxes/radios vertically; short related fields side-by-side is fine (expiry + CVC); very long → multi-step.
-- **Labels close to their fields** [PUI][RUI]: label→input gap (e.g. 4–8px) much smaller than field→field gap (e.g. 24–32px).
+- **Labels close to their fields** [PUI][RUI]: label→input gap (e.g. 4–8px) much smaller than field→field gap (e.g. 24–32px). Reference implementation: Material Design 3 text-field spec (`m3.material.io/components/text-fields/specs`) ships 16dp padding above the label, 8dp below the label, 8dp above/below the input line for normal density — a concrete, shipped number set at this same ratio.
+- **Diagram/illustration placed at the field it explains, not in a separate help panel** — two independent first-party sources converge: Baymard's checkout research (`baymard.com/learn/input-fields`) found 38% of test participants stalled at a credit-card "Security Code" field with no visual aid; adding an inline image of the card with the code location resolved it. NN/g (Wang, *"Few Guesses, More Success"*) documents the same pattern for a product serial-number field paired with a location illustration. Rule: when the hard part of a field is *finding* the value (physically printed somewhere), not *knowing the format*, an inline image beats text — this is a scoped exception to "no tooltips for hints" below, because the content is a location image, not a text rule that must be read before typing.
+- **Standardise field width as a grouping signal, not just an input-length affordance** — Apple HIG (text fields): "use consistent widths to create a more organized layout" for related fields (first/last name share one width; address/city another) — a second use for field width alongside "match width to expected answer length" below.
 - **Required & optional** —
   - [PUI] mark both: required with `*` (not red) + instruction at top, or "(required)" (safest); optional "(optional)". May skip marking for short familiar forms (login, newsletter), products with no optional fields, one-question-per-screen.
   - [KUL] mark only the minority — usually optional fields — to reduce clutter.
   - [TID] NN/g: marking required fields most usable; USWDS & GOV.UK: mark optional only.
   - [WSG] asterisk + programmatic `required`, never colour-only.
+  - **Spatially separate, not just mark** — Tullis & Pons (1997), via Bargas-Avila et al. (2010) *"Simple but Crucial User Interfaces in the WWW"*: people filled required fields fastest when required and optional fields were *physically grouped apart*, independent of marking convention. Interleaved required/optional fields in one visual block is a distinct problem from unmarked fields — group required fields together, optional fields in their own section (or behind opt-in per the bullet below), don't rely on `*`/`(optional)` text alone to do this job.
 - **Prefer opt-in to optional fields** [PUI]: checkbox "Receive updates via text message" reveals a required "Mobile number" (progressive disclosure).
 - **Match field width to input** [PUI][TID][KUL]: postcode 4–5 chars, CVC 3–4; width sets expectation.
 - **Conventional field styles** [PUI][WSG]: bordered rectangle, label above; radio circle left of label; checkbox square — keep iconic parts when customising (selectable cards still show the radio circle).
@@ -37,7 +40,7 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
   | new password | Password Strength Meter + rules up front + show/hide toggle | TID |
 - **Good Defaults & Smart Prefills** [TID]: prefill when most users won't change (location, today, known account data); never for sensitive answers (gender, citizenship, passwords). Menus default to non-actionable ("Select an item"), checkboxes unchecked [WSG].
 - **Input types** [KUL]: `type=email/tel/number/url`, `inputmode`, `autocomplete` tokens → right keyboards & autofill.
-- **Multi-step forms** [PUI][TID][KUL]: tell duration & what's needed upfront; chunk (30 questions → ~6 steps of 5); easiest first; progress indicator (Goal-Gradient Effect); review & edit before submit; success message + what happens next. Wizard only when the task is long/novel/branched; don't create a 2-step wizard [TID].
+- **Multi-step forms** [PUI][TID][KUL]: tell duration & what's needed upfront; chunk (30 questions → ~6 steps of 5); easiest first; progress indicator (Goal-Gradient Effect); review & edit before submit; success message + what happens next. Wizard only when the task is long/novel/branched; don't create a 2-step wizard [TID]. If steps repeat a help mechanism (contextual illustration, help link, chat trigger) across more than one step, keep it in the **same relative position** on every step — WCAG 2.2 SC 3.2.6 *Consistent Help* requires this for any help mechanism repeated across a set of pages.
 - **Group related fields under headings** when you can't split [PUI].
 - **Borders ≥3:1** on inputs, checkboxes, radios, toggles, steppers [PUI].
 - **Validation approaches** [PUI]:
@@ -80,6 +83,11 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
 | FM13 | Long forms | Steps with progress, duration notice, review screen, success + next steps; state saved | PUI, TID |
 | FM14 | Defaults | Sensible non-sensitive prefills; selects default to neutral option | TID, WSG |
 | FM15 | Spacing | Label↔input ≪ field↔field | RUI, PUI |
+| FM16 | Locatable-value diagram | Fields asking for a physically-located value (security code, serial number, activation code) paired with an inline image/diagram showing where to find it, not text-only hints | Baymard, NN/g (derived; not in source books) |
+| FM17 | Mobile landscape labels | Labels switch to left-aligned in landscape mobile (keyboard covers 67–82% of viewport); top-aligned in portrait | Baymard (derived; not in source books) |
+| FM18 | Width as grouping signal | Related fields sharing a row (name parts, address parts) use consistent widths within the group, distinct from unrelated groups | Apple HIG (derived; not in source books) |
+| FM19 | Tab order | Focus order through fields follows visual/logical reading order, not DOM-arbitrary order | Apple HIG, WCAG SC 1.3.2 |
+| FM20 | Required/optional grouping | Required and optional fields spatially grouped apart, not interleaved, independent of marking convention | Tullis & Pons 1997 via Bargas-Avila et al. 2010 (derived; not in source books) |
 
 ## Fix Recipes
 ```html
@@ -115,10 +123,11 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
 7. **Long survey on one page** → 5–7 themed steps, progress "Step 2 of 4", review screen.
 
 ## Conflicts & Context
-- **Required vs optional marking** — [PUI] both; [KUL] minority/optional only; [TID] NN/g all required vs gov standards optional-only. Recommendation: pick one per product; if most fields are required, mark optional "(optional)" and state "All fields required unless marked optional" *only* if testing shows people read it; otherwise PUI's asterisk + note. Always programmatic `required`.
+- **Required vs optional marking** — [PUI] both; [KUL] minority/optional only; [TID] NN/g all required vs gov standards optional-only. Recommendation: pick one per product; if most fields are required, mark optional "(optional)" and state "All fields required unless marked optional" *only* if testing shows people read it; otherwise PUI's asterisk + note. Always programmatic `required`. **Tension**: PUI specifies the asterisk "not red," but Pauwels et al. (2009), via Bargas-Avila et al. (2010), found colour-highlighted required fields outperformed asterisk-only on speed, errors, and satisfaction in a controlled study. Not resolved here — flag as a candidate to A/B test rather than overturning PUI's default.
 - **Radios vs dropdown thresholds** — ≤10 [PUI], 4–6 [WSG], dropdown >5 [KUL]. Use radios up to ~5 always, ~6–10 when vertical space allows.
 - **Disabled buttons / Input Prompt** — see ch08 conflict; default to enabled + validation.
 - **Hint position** — above field [PUI] vs below/beside [TID]. Prefer under the label (above input): visible before typing, not hidden by keyboard.
+- **On-blur inline validation** — Baymard's field research (`baymard.com/blog/inline-form-validation`) favours on-blur inline validation (32% of e-commerce sites lack any field-level validation; on-blur catches errors while fresh in mind). Bargas-Avila et al. (2009), in a controlled lab study, found the opposite: participants shown on-blur error messages made significantly *more* errors than those shown end-of-submit/pop-up presentation, because they ignored appearing-and-disappearing inline messages. FM10 keeps on-blur as the default (Baymard's larger, more recent field sample is the better bet for most products) — but treat it as a documented open tension, not settled fact, and consider testing end-of-submit presentation if on-blur validation isn't reducing errors in your own metrics.
 
 ## Anti-patterns
 - **Placeholder as label** [PUI][WSG].
@@ -143,4 +152,4 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
 6. Chunk long forms with progress, review and success.
 
 ## Connects To
-- **ch08** buttons & disabled states · **ch13** error copy · **ch15** labels/ARIA/focus · **ch03** spacing
+- **ch08** buttons & disabled states · **ch13** error copy · **ch15** labels/ARIA/focus · **ch03** spacing, L14 diagram-proximity/reading-order (general case of FM16/FM19)

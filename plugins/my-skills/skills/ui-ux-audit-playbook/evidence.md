@@ -16,8 +16,11 @@ Load tools first if deferred (`ToolSearch select:mcp__playwright__browser_naviga
 | 6b | `browser_resize` to the shortest realistic window height (e.g. 1280×600 — laptop with browser chrome) + screenshot | split-pane starvation: a `flex-grow` region eating a fixed-purpose sibling (tools/actions) down to invisible — see ch03 L13. Width-only breakpoint testing (step 2) never catches this. |
 | 7 | `mcp__playwright__browser_console_messages` | runtime errors, a11y warnings |
 | 8 | axe (if allowed): inject `https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js` via evaluate, run `axe.run()` | WCAG violations with selectors |
+| 9 | If the page has a `<form>`/`<fieldset>`: `browser_evaluate` the **form-layout snippet** below | current field/label/diagram arrangement — required input for ch09 lenses, see "Read as" table |
 
 Read-only rule: never click destructive controls, submit real forms, or change persisted settings during audit.
+
+**Gather before you judge.** ch09's Audit Checks table (FM2, FM4, FM7, FM15–19) and ch03's Gestalt/proximity checks (L2, L14) are pass/fail tests against *this page's current arrangement*, not against a memorized rule. Never assert a form-layout finding from a screenshot glance alone — run the snippet below first, then read each captured fact against the matching check. Static screenshots/code-only audits: derive the same facts by measuring `getBoundingClientRect()`-equivalent positions from CSS/DOM directly, or mark the check "needs verification" if you can't.
 
 ## Metrics snippet (`browser_evaluate`)
 Returns font-size census, contrast failures, small targets, spacing values off the 4px grid.
@@ -68,9 +71,95 @@ Returns font-size census, contrast failures, small targets, spacing values off t
 }
 ```
 
+## Form-layout snippet (`browser_evaluate`)
+Captures the *current* arrangement per form/fieldset — label position, column count, field widths, required/optional spatial clustering, and any image/diagram within adjacency range of a field (with DOM-order delta, for SC 1.3.2) — so ch09/ch03 checks below test facts, not guesses.
+
+```js
+() => {
+  const rect = el => el.getBoundingClientRect();
+  const domIndex = (() => { let i = 0; const map = new WeakMap(); (function walk(el){ map.set(el, i++); [...el.children].forEach(walk); })(document.body); return el => map.get(el) ?? -1; })();
+  const containers = [...document.querySelectorAll('form, fieldset')];
+  const scope = containers.length ? containers : [document.body];
+
+  return scope.map(container => {
+    const fields = [...container.querySelectorAll('input:not([type=hidden]), select, textarea')]
+      .filter(el => { const r = rect(el); return r.width > 0 && r.height > 0; });
+
+    const info = fields.map(f => {
+      const label = (f.labels && f.labels[0]) || document.querySelector(f.id ? `label[for="${f.id}"]` : null) || null;
+      const fr = rect(f), lr = label ? rect(label) : null;
+      let labelPos = label ? 'unclear' : 'MISSING';
+      if (lr) {
+        if (fr.top - lr.bottom >= -2 && fr.top - lr.bottom < 40) labelPos = 'above';
+        else if (lr.right <= fr.left + 4) labelPos = 'left';
+        else if (lr.left >= fr.right - 4) labelPos = 'right';
+      }
+      return {
+        field: f.name || f.id || f.tagName.toLowerCase(),
+        required: f.required,
+        x: Math.round(fr.left), y: Math.round(fr.top), width: Math.round(fr.width),
+        labelPos,
+        labelGapPx: lr ? Math.round(Math.max(0, Math.min(Math.abs(fr.top - lr.bottom), Math.abs(fr.left - lr.right)))) : null,
+      };
+    });
+
+    // column count: cluster distinct x-starts more than 40px apart
+    const xs = [...new Set(info.map(f => f.x))].sort((a, b) => a - b);
+    const columns = xs.reduce((cols, x) => { if (!cols.length || x - cols[cols.length - 1] > 40) cols.push(x); return cols; }, []);
+
+    // diagram/image adjacency to each field, with DOM-order delta (SC 1.3.2 signal)
+    const media = [...container.querySelectorAll('img, svg, picture, canvas')];
+    const diagramLinks = [];
+    for (const f of fields) {
+      const fr = rect(f);
+      for (const m of media) {
+        const mr = rect(m);
+        const dx = Math.max(fr.left - mr.right, mr.left - fr.right, 0);
+        const dy = Math.max(fr.top - mr.bottom, mr.top - fr.bottom, 0);
+        const dist = Math.round(Math.hypot(dx, dy));
+        if (dist < 150) diagramLinks.push({
+          field: f.name || f.id || f.tagName.toLowerCase(),
+          media: m.tagName.toLowerCase() + (m.getAttribute('alt') ? `[alt="${m.getAttribute('alt').slice(0, 40)}"]` : '[NO ALT]'),
+          distancePx: dist,
+          domOrderDelta: domIndex(m) - domIndex(f), // 0 = adjacent in DOM too; large |delta| = visual-only adjacency, check SC 1.3.2
+        });
+      }
+    }
+
+    // required/optional interleaving: do required and optional fields alternate in reading order (no spatial separation)?
+    const interleaved = info.length > 1 && info.some((f, i) => i > 0 && f.required !== info[i - 1].required);
+
+    return {
+      container: container.tagName.toLowerCase() + (container.id ? '#' + container.id : container.className ? '.' + String(container.className).split(/\s+/)[0] : ''),
+      fieldCount: fields.length,
+      columnCount: columns.length, // >1 with no matching short-pair rationale (expiry+CVC, day+month+year) → FM2/Baymard multicolumn check
+      labelPositions: [...new Set(info.map(f => f.labelPos))], // mixed positions in one form = FM2 fail
+      requiredCount: info.filter(f => f.required).length,
+      optionalCount: info.filter(f => !f.required).length,
+      requiredOptionalInterleaved: interleaved, // true + both counts >0 → gap #5 (Tullis & Pons 1997): not spatially separated
+      diagramLinks, // empty + field name suggests physically-located value (code/serial/CVV) → candidate FM16 gap
+      fields: info.slice(0, 40),
+    };
+  });
+}
+```
+
+**Read as** — map captured facts to checks, don't re-derive the rule each time:
+
+| Captured fact | Check it feeds |
+|---|---|
+| `labelPositions` has >1 value in one form | ch09 FM2 (mixed label position) |
+| `columnCount > 1` and fields aren't a documented short-pair (expiry/CVC, day/month/year, city/state/ZIP) | ch09 FM2, Baymard multicolumn finding |
+| `labelGapPx` for label↔input vs. measured field↔field gap | ch09 FM15 / ch03 L2 |
+| `requiredOptionalInterleaved: true` with both counts >0 | ch09 FM4 spatial-separation gap (Tullis & Pons 1997) |
+| field name/label suggests a physically-located value (serial no., security code, activation code) and `diagramLinks` is empty for it | ch09 FM16 |
+| `diagramLinks[].domOrderDelta` far from 0 for a visually-adjacent image | ch03 L14 / WCAG SC 1.3.2 — verify with `browser_snapshot`'s accessibility-tree order, not just this heuristic |
+| viewport width/height from step 2 shows landscape mobile (`width > height`, `width < 900`) and `labelPositions` is `['above']` | ch09 FM17 |
+
 ## Limits (state in report)
 - Contrast uses nearest opaque ancestor background — gradients, images, overlays, `backdrop-filter`, canvas/WebGL text → verify manually on screenshot.
 - Target check measures element box, not extended hit area (pseudo-elements, padding on parent).
 - Off-grid spacing = hint, not violation; judge against project tokens.
 - Canvas/WebGL UIs (3D viewers): DOM metrics cover chrome only; audit canvas overlays from screenshots.
 - No screen-reader or real-device run → list under "needs verification".
+- Form-layout snippet's `labelPos` and `diagramLinks` are geometric heuristics (bounding-box position/distance), not a semantic reading-order check — always cross-check any flagged `domOrderDelta` against `browser_snapshot`'s actual accessibility-tree order before citing SC 1.3.2 as a violation, don't cite the heuristic alone.
