@@ -420,11 +420,30 @@ Pitfall `Applies: n/a` is **not** punch-list item at any priority — report in 
 [HIGH] <one-line title>
   Where: <file>:<line> (exact, from what you just read in Step 1 — never guess a line number)
   Now:   <what's actually there today, quoted>
-  Change: <concrete diff-shaped snippet, using this repo's actual imports/names>
   Why: project research doc §<n> (if one exists) and/or ref-0N (RTR3|PBRT3 §x.y) — <one-clause reason>
+  Implementation:
+    <full step-by-step build guide — see required shape below, not a one-line diff>
+  Parameters: <every numeric/enum knob touched, starting value, and why that value — table if 3+>
+  Failure modes: <specific ways THIS change breaks, symptom → cause → fix, not generic advice>
   Accept: <falsifiable pass/fail rule that proves the change landed and works — see rule types below>
   Depends on: <other punch-list item, if sequencing matters — e.g. "2.4 shadows depends on 2.2 lighting">
 ```
+
+**`Implementation:` must be buildable by someone who has not read this skill or the research doc.** A single diff fragment is not enough — write it as an ordered sequence someone can execute top to bottom:
+
+1. **Full code, not a fragment.** Quote the complete before-state of the function/component/block being changed (from what Step 1 actually read), then the complete after-state — every import, every prop, every closing tag — not `...` elisions in the parts that changed. A fragment forces the implementer to guess how it merges with surrounding code; guessing is where "should work now" bugs come from.
+2. **Order multi-part changes.** If the change touches more than one file or more than one spot in a file (e.g. 2.2's material swap + `<Environment>` addition), number the parts in the order they must land — state explicitly if order doesn't matter vs. must be sequential (e.g. "material change alone is invisible until the light/environment part also lands — implement both before testing either").
+3. **Name every new dependency.** Package name, exact install command (`npm install @react-three/postprocessing`), and the minimum version this skill's research relies on (see P-11.8f-style version checks) — don't assume the reader will infer the package from an import line.
+4. **State the manual verification action**, distinct from `Accept:` — `Accept:` is the automated/measurable pass criterion; this is "open the dev server, orbit to X angle, look for Y" — the concrete human action that produces the evidence `Accept:` checks.
+
+**`Parameters:`** — every prop/uniform/config value touched gets its starting numeric value and the one-clause reason for that value (cite research § or ref-0N), not just the value alone. A value with no stated reason is indistinguishable from a guess to the next person tuning it. Use a table once 3 or more parameters are involved:
+
+| Prop | Value | Why |
+|---|---|---|
+| `shadow-bias` | `-0.005` | starting point for shadow acne on this geometry scale, research §11.4a |
+| `shadow-mapSize` | `[2048, 2048]` | balances resolution vs. mobile cost, tune down under `quality !== 'high'` |
+
+**`Failure modes:`** — at minimum, cover: (a) the most likely way this specific change silently does nothing (e.g. material swapped but no light exists yet — zero visible effect, no error), (b) the most likely way it silently does the wrong thing (e.g. metalness at 0.5 instead of 0/1 — renders, looks plausible, is physically wrong), (c) any interaction with a pitfall from Step 2.5 that this change makes newly `Applies: now`.
 
 **`Accept:` is mandatory, not optional narration.** It must be checkable by someone who didn't write the code, without re-reading this skill's reasoning. Every item's dimension in Step 2/2.5 above already models one; pick the matching rule type rather than inventing a new shape each time:
 
@@ -437,6 +456,8 @@ Pitfall `Applies: n/a` is **not** punch-list item at any priority — report in 
 | **Visual yes/no** | one specific 4c-style question, answerable from a screenshot, not "looks better" | shaft direction matches key light position (2.6b) |
 
 A punch-list item whose `Accept:` line reduces to "looks good" or "should work now" is not done — go back and find the config value, grep pattern, measured number, or specific screenshot comparison that would prove it.
+
+**Depth is not optional padding — apply the full `Implementation`/`Parameters`/`Failure modes` shape to every `[HIGH]` and `[MEDIUM]` item.** `[LOW]` items may compress `Implementation` to a single confirmed-correct snippet if the change is genuinely one line with no sequencing and no parameter to tune — state why it qualifies for the shorter form rather than defaulting to it.
 
 Order by dependency chain, not just impact — 2.2 (lighting + material swap) blocks nearly everything, so almost always `[HIGH]` #1 regardless. If the project has other, deliberately non-realistic display modes, put 2.9 (mode/quality gating) alongside it so the change ships as a togglable feature, not a silent behavior change to those other modes.
 
