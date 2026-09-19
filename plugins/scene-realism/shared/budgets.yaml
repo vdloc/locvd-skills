@@ -1,0 +1,34 @@
+# Default verification budgets. A project overrides any of these in its own
+# scene/config.yaml under the same keys — these are defaults, not limits
+# this plugin enforces on every project unconditionally.
+#
+# Sourced defaults are labeled with where the number comes from; unlabeled
+# numbers are this plugin's own starting point, not an external standard —
+# see docs/RESEARCH-REALISTIC-PIPELINE.md for the full discussion.
+
+draw_calls:
+  # react-three-fiber's performance guidance treats ~1000 draw calls as a
+  # practical ceiling for one scene on a mid-range device.
+  # source: docs/RESEARCH-REALISTIC-PIPELINE.md §I
+  warn: 1000
+  max: null   # null = warn only, never a hard failure, unless the project sets one
+
+gpu_texture_mb:
+  # No standards-body number exists for this; it is sized against a
+  # discrete mid-range GPU's texture budget as a conservative default.
+  # label: [PROJECT CHOICE]
+  warn: 256
+  max: 512
+
+metalness_tolerance:
+  # A metallicFactor (or an ARM map's blue channel mean) should sit within
+  # this distance of 0.0 (dielectric) or 1.0 (metal). Values in between
+  # describe no real single material.
+  # source: docs/RESEARCH-REALISTIC-PIPELINE.md §B.2 (Filament PBR guide)
+  value: 0.05
+
+albedo_linear_range:
+  # Plausible linear-light diffuse albedo for any real-world surface.
+  # source: docs/RESEARCH-REALISTIC-PIPELINE.md §B.2 (Filament PBR guide)
+  min: 0.03
+  max: 0.90

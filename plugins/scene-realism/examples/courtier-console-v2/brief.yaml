@@ -1,0 +1,33 @@
+# plugins/scene-realism/examples/courtier-console-v2/brief.yaml
+#
+# A worked, non-default example — NOT copied into new projects. It shows
+# the brief that would describe the real courtier-console-v2 project
+# (https://github.com/vdloc/courtier-console-v2), whose realistic-mode
+# pipeline this plugin's design was generalized from.
+project:
+  name: courtier-console-v2
+  units: meters
+  up_axis: "+Y"
+input:
+  kind: glb
+  path: public/structure_demo.glb
+style:
+  mode: realistic-industrial
+  supports_mode_switch: true   # this project also has a flat "engineering" mode
+targets:
+  web: true
+  offline: false
+  ar: false
+budgets:
+  max_draw_calls: 4000        # this project accepts more than the 1000 default —
+                               # see docs/RESEARCH-REALISTIC-PIPELINE.md §I for why
+                               # per-part selection was chosen over merging meshes
+  max_gpu_texture_mb: 256
+interaction:
+  parts_individually_selectable: true
+  parts_individually_animatable: true   # the construction-sequence timeline
+delivery:
+  offline_capable: true       # HDRI and model are bundled locally, not CDN-fetched
+  license_policy: cc0-only
+  strict_verify: false
+language: vi

@@ -17,6 +17,12 @@
       "description": "Guardrail/productivity hooks for Next.js + React + Three.js + GSAP.",
       "source": "./plugins/frontend-guardrails",
       "category": "productivity"
+    },
+    {
+      "name": "scene-realism",
+      "description": "Converts a plain-geometry 3D scene into a realistic one: CC0 PBR materials, physically-based lighting, automated verification.",
+      "source": "./plugins/scene-realism",
+      "category": "3d"
     }
   ]
 }

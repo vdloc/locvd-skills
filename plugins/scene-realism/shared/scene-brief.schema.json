@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vdloc/locvd-skills/scene-realism/scene-brief.schema.json",
+  "title": "scene-realism scene brief",
+  "type": "object",
+  "required": ["project", "input", "style", "targets", "interaction", "delivery"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "required": ["name", "units", "up_axis"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "units": {"type": "string", "enum": ["meters"]},
+        "up_axis": {"type": "string", "enum": ["+Y", "+Z"]}
+      }
+    },
+    "input": {
+      "type": "object",
+      "required": ["kind", "path"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["threejs-source", "gltf", "glb", "ifc", "step", "blender"]
+        },
+        "path": {"type": "string", "minLength": 1}
+      }
+    },
+    "style": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["realistic-industrial", "product-clean", "stylized", "technical-drawing"]
+        },
+        "supports_mode_switch": {"type": "boolean", "default": false}
+      }
+    },
+    "targets": {
+      "type": "object",
+      "required": ["web"],
+      "properties": {
+        "web": {"type": "boolean"},
+        "offline": {"type": "boolean", "default": false},
+        "ar": {"type": "boolean", "default": false}
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "max_draw_calls": {"type": "integer", "minimum": 1},
+        "max_triangles": {"type": "integer", "minimum": 1},
+        "max_gpu_texture_mb": {"type": "number", "exclusiveMinimum": 0},
+        "max_glb_mb": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "interaction": {
+      "type": "object",
+      "required": ["parts_individually_selectable"],
+      "properties": {
+        "parts_individually_selectable": {"type": "boolean"},
+        "parts_individually_animatable": {"type": "boolean", "default": false}
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "required": ["license_policy"],
+      "properties": {
+        "offline_capable": {"type": "boolean", "default": false},
+        "license_policy": {"type": "string", "enum": ["cc0-only", "allow-attribution"]},
+        "strict_verify": {"type": "boolean", "default": false}
+      }
+    },
+    "language": {"type": "string", "default": "en"}
+  }
+}
