@@ -2,7 +2,7 @@
 third-party JSON Schema library — shared/ stays standard-library-only.
 
 Supports exactly the subset of JSON Schema the brief schema uses: object
-`required`/`properties`, string `enum`, numeric `minimum`/
+`required`/`properties`, string `enum`/`minLength`, numeric `minimum`/
 `exclusiveMinimum`, and `type` checks for object/string/boolean/integer/
 number. If the schema grows past that subset, extend `_check_node`, not the
 schema file alone.
@@ -47,6 +47,12 @@ def _check_node(value, node_schema: dict, path: str, errors: list[str]) -> None:
         for key, child_schema in node_schema.get("properties", {}).items():
             if key in value:
                 _check_node(value[key], child_schema, f"{path}.{key}", errors)
+
+    if expected_type == "string" and "minLength" in node_schema:
+        if len(value) < node_schema["minLength"]:
+            errors.append(
+                f"{path}: must be at least {node_schema['minLength']} character(s) long"
+            )
 
     if "enum" in node_schema and value not in node_schema["enum"]:
         errors.append(f"{path}: {value!r} is not one of {node_schema['enum']}")

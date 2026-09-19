@@ -61,7 +61,29 @@ class ParseGlbTests(unittest.TestCase):
 
 class DrawCallAndMetalnessTests(unittest.TestCase):
     def test_count_draw_calls_counts_nodes_with_a_mesh(self):
-        gltf = {"nodes": [{"mesh": 0}, {"mesh": 1}, {"name": "empty-group"}]}
+        gltf = {
+            "nodes": [{"mesh": 0}, {"mesh": 1}, {"name": "empty-group"}],
+            "meshes": [{"primitives": [{}]}, {"primitives": [{}]}],
+        }
+        self.assertEqual(vb.count_draw_calls(gltf), 2)
+
+    def test_count_draw_calls_counts_every_primitive_of_a_mesh(self):
+        # one node, one mesh, 1500 primitives = 1500 draw calls, not 1
+        gltf = {
+            "nodes": [{"mesh": 0}],
+            "meshes": [{"primitives": [{} for _ in range(1500)]}],
+        }
+        self.assertEqual(vb.count_draw_calls(gltf), 1500)
+
+    def test_count_draw_calls_counts_a_shared_mesh_once_per_node(self):
+        gltf = {
+            "nodes": [{"mesh": 0}, {"mesh": 0}, {"mesh": 0}],
+            "meshes": [{"primitives": [{}, {}]}],
+        }
+        self.assertEqual(vb.count_draw_calls(gltf), 6)
+
+    def test_count_draw_calls_falls_back_to_one_when_mesh_is_unresolvable(self):
+        gltf = {"nodes": [{"mesh": 0}, {"mesh": 7}]}  # no "meshes" array at all
         self.assertEqual(vb.count_draw_calls(gltf), 2)
 
     def test_metalness_factors_reads_declared_values_and_glb_default(self):

@@ -90,6 +90,22 @@ def download_map(
     os.makedirs(dest_dir, exist_ok=True)
     local_path = os.path.join(dest_dir, f"{asset_id}_{map_name}_{resolution}.{file_format}")
 
+    # The cache is shared across projects: a file already on disk whose MD5
+    # matches Poly Haven's is reused with no network call. A mismatch (partial
+    # or corrupt earlier download) falls through to a fresh download.
+    if os.path.isfile(local_path):
+        with open(local_path, "rb") as handle:
+            cached = handle.read()
+        if hashlib.md5(cached).hexdigest() == expected_md5:
+            return DownloadedMap(
+                map_name=map_name,
+                resolution=resolution,
+                url=url,
+                md5=expected_md5,
+                local_path=local_path,
+                size_bytes=len(cached),
+            )
+
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=60) as response:
         payload = response.read()

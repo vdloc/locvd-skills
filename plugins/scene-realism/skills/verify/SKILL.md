@@ -32,7 +32,8 @@ texture_memory = estimate_gpu_texture_bytes(gltf, bin_chunk)
 1. **glTF Validator.** Run the official Khronos glTF Validator against the
    GLB (install/invoke per its own docs — this plugin doesn't vendor it).
    Any error is a `fail`; warnings are reported but don't block.
-2. **Draw calls.** `count_draw_calls(gltf)` against `budgets.draw_calls`:
+2. **Draw calls.** `count_draw_calls(gltf)` (one per mesh *primitive* per
+   node, not one per node) against `budgets.draw_calls`:
    `warn` at the configured threshold, `fail` only if the project set a
    hard `max`.
 3. **GPU texture memory.** `estimate_gpu_texture_bytes(gltf,

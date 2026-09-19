@@ -29,6 +29,12 @@ below are the widely-cited reference:
   **0.03–0.90** per channel. A value near 0 with `metallicFactor: 0` is
   implausible (near-black paint still reflects a few percent); a value
   above ~0.9 is implausible even for a bright surface under linear light.
+- These limits are **linear** values. A Diffuse/base-color image is
+  sRGB-encoded, so decode each sampled pixel to linear light before
+  averaging (`check_maps.linear_albedo_means`); comparing raw sampled
+  values against the range accepts textures that are too dark and rejects
+  valid bright ones. ARM/ORM and normal maps are linear data — do not
+  decode them.
 - Bare-metal reflectance (F0, not albedo — read as the base color channel
   when `metallicFactor` is 1) is typically **≥ 0.5**, and colored (unlike a
   dielectric's near-neutral F0).

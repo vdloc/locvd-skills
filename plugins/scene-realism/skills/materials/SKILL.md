@@ -48,9 +48,17 @@ GL-convention; see `shared/pbr-physics.md`). Never download `Displacement`
 or `.blend`/`.gltf` bundles — they aren't needed by this pipeline's
 material path.
 
-Pick `resolution` from `scene/brief.yaml`'s `budgets.max_gpu_texture_mb`:
-start at `2k`, drop to `1k` if the running total (see `verify`'s texture-
-memory estimate) would exceed the budget once all substances are counted.
+Pick `resolution` from the GPU texture budget, resolved in this order (first
+one present wins — the brief schema does not require a `budgets` block, and
+`intake` writes the device-tier budgets to `config.yaml`, so do not assume
+the brief has one):
+
+1. `scene/config.yaml` → `budgets.gpu_texture_mb.max`
+2. `scene/brief.yaml` → `budgets.max_gpu_texture_mb`
+3. `${CLAUDE_PLUGIN_ROOT}/shared/budgets.yaml` → `gpu_texture_mb.max`
+
+Start at `2k`, drop to `1k` if the running total (see `verify`'s texture-
+memory estimate) would exceed that budget once all substances are counted.
 
 `dest_dir` is `${CLAUDE_PLUGIN_DATA}/polyhaven-cache/<asset_id>/` — shared
 across projects, so a second project reusing the same asset doesn't
@@ -63,13 +71,19 @@ For each downloaded set, use `${CLAUDE_PLUGIN_ROOT}/shared/check_maps.py`:
 ```python
 import sys
 sys.path.insert(0, "${CLAUDE_PLUGIN_ROOT}/shared")
-from check_maps import load_rgb_pixels, metalness_is_plausible, albedo_is_plausible, normal_map_is_gl_convention
+from check_maps import (
+    load_rgb_pixels, linear_albedo_means, albedo_is_plausible,
+    metalness_is_plausible, normal_map_is_gl_convention,
+)
 
-albedo_pixels = load_rgb_pixels(diffuse_path)
-arm_pixels = load_rgb_pixels(arm_path)
-normal_pixels = load_rgb_pixels(normal_path)
+albedo_pixels = load_rgb_pixels(diffuse_path)   # sRGB-encoded, 0..1
+arm_pixels = load_rgb_pixels(arm_path)          # linear data
+normal_pixels = load_rgb_pixels(normal_path)    # linear data
 
-albedo_means = tuple(sum(c[i] for c in albedo_pixels) / len(albedo_pixels) for i in range(3))
+# Only the Diffuse map is sRGB. Decode it to linear light before comparing to
+# the albedo range (which is linear reflectance); ARM and normal maps are
+# already linear and are used as sampled.
+albedo_means = linear_albedo_means(albedo_pixels)
 blue_channel = [c[2] for c in arm_pixels]
 
 assert albedo_is_plausible(albedo_means), "albedo outside plausible range — see pbr-physics.md"

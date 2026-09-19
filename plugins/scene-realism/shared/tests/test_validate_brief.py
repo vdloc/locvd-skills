@@ -32,6 +32,14 @@ class ValidateBriefTests(unittest.TestCase):
         errors = validate_brief(brief)
         self.assertTrue(any("style" in e or "mode" in e for e in errors))
 
+    def test_empty_required_strings_are_reported(self):
+        brief = json.loads(json.dumps(VALID_BRIEF))
+        brief["project"]["name"] = ""
+        brief["input"]["path"] = ""
+        errors = validate_brief(brief)
+        self.assertTrue(any("project.name" in e for e in errors), errors)
+        self.assertTrue(any("input.path" in e for e in errors), errors)
+
     def test_missing_nested_required_key_is_reported(self):
         brief = json.loads(json.dumps(VALID_BRIEF))
         del brief["project"]["units"]

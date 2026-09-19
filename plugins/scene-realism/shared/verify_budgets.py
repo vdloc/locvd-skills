@@ -53,8 +53,26 @@ def parse_glb(data: bytes) -> tuple[dict, bytes]:
 
 
 def count_draw_calls(gltf: dict) -> int:
-    """One draw call per node that references a mesh — R3F's budget metric."""
-    return sum(1 for node in gltf.get("nodes", []) if "mesh" in node)
+    """One draw call per primitive of every mesh a node instantiates.
+
+    A glTF mesh is a list of primitives and each primitive renders as its own
+    draw call, so a node that references a 1,500-primitive mesh costs 1,500,
+    not 1. A mesh shared by several nodes counts once per node (each node is
+    drawn). If a node's mesh index cannot be resolved (no `meshes` array, or
+    an out-of-range index) it counts as a single call rather than being
+    dropped — an undercount would let a malformed file pass the gate.
+    """
+    meshes = gltf.get("meshes", [])
+    total = 0
+    for node in gltf.get("nodes", []):
+        if "mesh" not in node:
+            continue
+        index = node["mesh"]
+        if isinstance(index, int) and 0 <= index < len(meshes):
+            total += max(1, len(meshes[index].get("primitives", [])))
+        else:
+            total += 1
+    return total
 
 
 def metalness_factors(gltf: dict) -> dict[str, float]:

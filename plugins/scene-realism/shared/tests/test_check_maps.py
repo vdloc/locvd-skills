@@ -41,6 +41,37 @@ class AlbedoTests(unittest.TestCase):
         self.assertFalse(check_maps.albedo_is_plausible((0.95, 0.95, 0.95)))
 
 
+class SrgbToLinearTests(unittest.TestCase):
+    def test_endpoints_are_fixed(self):
+        self.assertEqual(check_maps.srgb_to_linear(0.0), 0.0)
+        self.assertAlmostEqual(check_maps.srgb_to_linear(1.0), 1.0)
+
+    def test_mid_grey_matches_the_srgb_curve(self):
+        # sRGB 0.5 encodes linear ~0.2140 (IEC 61966-2-1)
+        self.assertAlmostEqual(check_maps.srgb_to_linear(0.5), 0.2140, places=3)
+
+    def test_toe_segment_is_linear(self):
+        self.assertAlmostEqual(check_maps.srgb_to_linear(0.04), 0.04 / 12.92)
+
+    def test_albedo_means_are_taken_in_linear_light(self):
+        # an sRGB 0.5 grey is linear 0.214: a plausible albedo whose
+        # *encoded* value (0.5) would look brighter than it is
+        means = check_maps.linear_albedo_means([(0.5, 0.5, 0.5)] * 4)
+        for channel in means:
+            self.assertAlmostEqual(channel, 0.2140, places=3)
+
+    def test_encoded_value_that_looks_ok_is_too_dark_in_linear_light(self):
+        # sRGB 0.15 passes a naive 0.03..0.90 check but is linear ~0.020
+        encoded = (0.15, 0.15, 0.15)
+        self.assertTrue(check_maps.albedo_is_plausible(encoded))
+        linear = check_maps.linear_albedo_means([encoded])
+        self.assertFalse(check_maps.albedo_is_plausible(linear))
+
+    def test_empty_samples_raise(self):
+        with self.assertRaises(ValueError):
+            check_maps.linear_albedo_means([])
+
+
 class NormalMapConventionTests(unittest.TestCase):
     def test_typical_flat_normal_map_passes(self):
         self.assertTrue(check_maps.normal_map_is_gl_convention(0.5, 0.98))

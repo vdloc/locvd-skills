@@ -44,8 +44,40 @@ def metalness_is_plausible(blue_channel: list[float], tolerance: float = METALNE
     return stats.mean <= tolerance or stats.mean >= 1.0 - tolerance
 
 
+def srgb_to_linear(value: float) -> float:
+    """Decode one sRGB-encoded channel (0..1) to linear light (IEC 61966-2-1)."""
+    if value <= 0.04045:
+        return value / 12.92
+    return ((value + 0.055) / 1.055) ** 2.4
+
+
+def linear_albedo_means(
+    encoded_rgb_pixels: list[tuple[float, float, float]],
+) -> tuple[float, float, float]:
+    """Per-channel mean of sRGB-encoded diffuse samples, taken in linear light.
+
+    Diffuse/base-color images are sRGB-encoded, but the plausibility range in
+    `albedo_is_plausible` is linear reflectance. Each sample is decoded first
+    and averaged after — averaging encoded values and then decoding (or not
+    decoding at all) gives a different, wrong number. Feed the result to
+    `albedo_is_plausible`. Only the Diffuse map is sRGB; ARM and normal maps
+    are linear data and must NOT go through this.
+    """
+    if not encoded_rgb_pixels:
+        raise ValueError("linear_albedo_means: no pixels given")
+    count = len(encoded_rgb_pixels)
+    return tuple(  # type: ignore[return-value]
+        sum(srgb_to_linear(pixel[channel]) for pixel in encoded_rgb_pixels) / count
+        for channel in range(3)
+    )
+
+
 def albedo_is_plausible(rgb_means: tuple[float, float, float]) -> bool:
-    """True if every channel of a linear-light albedo mean sits in a real-world range."""
+    """True if every channel of a linear-light albedo mean sits in a real-world range.
+
+    Takes LINEAR values. For an sRGB Diffuse image, get them from
+    `linear_albedo_means` rather than averaging the raw sampled pixels.
+    """
     return all(ALBEDO_MIN <= channel <= ALBEDO_MAX for channel in rgb_means)
 
 

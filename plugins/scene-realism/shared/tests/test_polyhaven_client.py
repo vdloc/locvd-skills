@@ -84,6 +84,40 @@ class DownloadMapTests(unittest.TestCase):
                     file_format="jpg", files=self.files_response,
                 )
 
+    @patch("polyhaven_client.urllib.request.urlopen")
+    def test_reuses_a_cached_file_whose_checksum_matches(self, mock_urlopen):
+        with tempfile.TemporaryDirectory() as tmp:
+            cached = os.path.join(tmp, "rusty_metal_04_Diffuse_2k.jpg")
+            with open(cached, "wb") as handle:
+                handle.write(self.payload)
+
+            result = client.download_map(
+                "rusty_metal_04", "Diffuse", "2k", tmp,
+                file_format="jpg", files=self.files_response,
+            )
+
+            mock_urlopen.assert_not_called()  # no network for a verified cache hit
+            self.assertEqual(result.local_path, cached)
+            self.assertEqual(result.md5, self.md5)
+            self.assertEqual(result.size_bytes, len(self.payload))
+
+    @patch("polyhaven_client.urllib.request.urlopen")
+    def test_redownloads_a_cached_file_whose_checksum_is_wrong(self, mock_urlopen):
+        mock_urlopen.return_value = FakeResponse(self.payload)
+        with tempfile.TemporaryDirectory() as tmp:
+            cached = os.path.join(tmp, "rusty_metal_04_Diffuse_2k.jpg")
+            with open(cached, "wb") as handle:
+                handle.write(b"truncated-or-corrupt")
+
+            result = client.download_map(
+                "rusty_metal_04", "Diffuse", "2k", tmp,
+                file_format="jpg", files=self.files_response,
+            )
+
+            mock_urlopen.assert_called_once()
+            with open(result.local_path, "rb") as handle:
+                self.assertEqual(handle.read(), self.payload)
+
     def test_missing_map_or_resolution_raises(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(client.PolyHavenError):
