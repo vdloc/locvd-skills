@@ -1,0 +1,15 @@
+{
+  "skill": "intake",
+  "cases": [
+    {
+      "id": "detects-existing-glb",
+      "prompt": "I have a GLB with plain gray materials at public/model.glb, make it look realistic",
+      "expect": "Reads the GLB's node names/extras before asking anything; asks only for visual style, delivery targets, interaction requirements, device tier, and licensing policy; writes and validates scene/brief.yaml against scene-brief.schema.json before finishing."
+    },
+    {
+      "id": "does-not-assume-threejs",
+      "prompt": "Convert my IFC building export into a realistic web scene",
+      "expect": "Records input.kind as 'ifc' in the brief, does not assume a three.js source, and does not silently fall back to name-prefix classification rules later."
+    }
+  ]
+}

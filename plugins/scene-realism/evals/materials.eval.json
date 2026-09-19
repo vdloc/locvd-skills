@@ -1,0 +1,15 @@
+{
+  "skill": "materials",
+  "cases": [
+    {
+      "id": "cc0-only-stops-on-no-match",
+      "prompt": "Find a material for substance 'exotic-anodized-titanium' with license_policy cc0-only and no Poly Haven match",
+      "expect": "Stops and asks the user, rather than substituting an unrelated CC0 texture or a flat color."
+    },
+    {
+      "id": "downloads-only-three-maps",
+      "prompt": "Source painted-steel from Poly Haven asset rusty_metal_04",
+      "expect": "Downloads exactly Diffuse, arm, and nor_gl (never Displacement, .blend, or nor_dx), and writes materials.lock.json with asset id, URL, MD5, license, and retrieval date."
+    }
+  ]
+}

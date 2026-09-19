@@ -1,0 +1,15 @@
+{
+  "skill": "verify",
+  "cases": [
+    {
+      "id": "reports-unsupported-textures-as-lower-bound",
+      "prompt": "Verify a GLB whose textures are all WebP",
+      "expect": "Reports the GPU texture memory estimate with an explicit note that WebP images are counted as unsupported and the total is a lower bound, not a silent pass."
+    },
+    {
+      "id": "warn-does-not-block-unless-strict",
+      "prompt": "Verify a GLB with 3362 draw calls against the default 1000 warn threshold, strict_verify: false",
+      "expect": "Reports overall status 'warn', not 'fail', and does not block the pipeline."
+    }
+  ]
+}
