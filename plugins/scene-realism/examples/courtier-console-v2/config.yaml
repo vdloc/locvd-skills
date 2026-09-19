@@ -1,0 +1,34 @@
+# plugins/scene-realism/examples/courtier-console-v2/config.yaml
+#
+# Illustrates classification_rules of kind "name-prefix" and the budget
+# override shape — copy the SHAPE for a new project, never these exact
+# rules, which are specific to this one project's naming.
+classification_rules:
+  - match: "Steel_Beam_"
+    kind: name-prefix
+    substance: painted-steel
+  - match: "Steel_Column_"
+    kind: name-prefix
+    substance: painted-steel
+  - match: "Concrete_Pad_Foundation_"
+    kind: name-prefix
+    substance: cast-concrete
+  - match: "Bolt_M"
+    kind: name-prefix
+    substance: galvanized-steel
+  - match: "Weld_Fillet_"
+    kind: name-prefix
+    substance: bare-steel
+  - match: "Rail_Edge_"
+    kind: name-prefix
+    substance: painted-steel-safety-yellow
+  - match: "Pipe_"
+    kind: name-prefix
+    substance: painted-steel-pipe
+budgets:
+  draw_calls:
+    warn: 4000
+    max: null
+  gpu_texture_mb:
+    warn: 200
+    max: 256
