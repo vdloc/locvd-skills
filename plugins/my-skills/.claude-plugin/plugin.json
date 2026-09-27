@@ -1,7 +1,7 @@
 {
   "name": "my-skills",
-  "version": "0.5.0",
-  "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer, prompt language normalization, UI/UX audit playbook, 3D realism audit.",
+  "version": "0.6.0",
+  "description": "Personal skill bundle: EN-VI translation, Vietnamese concept explainer, prompt language normalization, UI/UX audit playbook, 3D realism audit, AIUX pattern gate.",
   "author": {
     "name": "locvd"
   },
