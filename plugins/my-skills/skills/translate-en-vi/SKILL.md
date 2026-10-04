@@ -214,6 +214,22 @@ the word and asking the learner to recall its meaning, before the vocabulary tab
 any new word at Times Seen = 1. This step isn't optional: a log that never gets written to
 never learns anything about the user, and every later table above depends on it being current.
 
+## Pronunciation Audio
+
+The skill speaks the English source aloud so the learner hears it next to the IPA. It uses
+`speak.sh` in this skill's base directory (edge-tts, voice `en-US-AndrewNeural` — General
+American, matching the IPA convention above).
+
+- **Bare word/short fragment:** run `bash <base-dir>/speak.sh "<word>"` once, after writing the
+  response.
+- **Full sentence/prose:** speak the English source once. Over ~300 characters, speak only the
+  first sentence. Never speak the Vietnamese translation.
+- **Opt out:** skip audio if the user says no audio / "không cần đọc" / "mute", and keep
+  skipping for the rest of the session. Replay on request ("đọc lại", "say it again"), or use
+  `en-GB-SoniaNeural` as the voice arg if they ask for British.
+- The script exits 0 silently when edge-tts, network, or a player is missing — never mention
+  or retry a failed playback. Install: `uv tool install edge-tts`.
+
 ## Before Returning: Quick Self-Check
 
 - Meaning, names, numbers, and placeholders unchanged from the source?
@@ -230,6 +246,7 @@ never learns anything about the user, and every later table above depends on it 
 - Grammar/structure notes present if the source has any construction above elementary level?
 - `vocab-log.md` checked before building the table, and updated for every word after
   responding?
+- Audio played once via `speak.sh` (unless the user opted out)?
 
 ## Output
 
