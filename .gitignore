@@ -1,3 +1,5 @@
 .DS_Store
 Thumbs.db
 plugins/my-skills/skills/translate-en-vi/vocab-log.md
+__pycache__/
+*.pyc

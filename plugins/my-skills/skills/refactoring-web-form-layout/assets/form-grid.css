@@ -1,0 +1,114 @@
+/* form-grid.css: column grid for forms (desktop + tablet), input tables on the same grid, side panel.
+   Copy what you need; rename classes to the project's convention.
+
+   Markup contract
+     <div class="form-shell">                 container that decides the column count
+       <form class="form" novalidate>
+         <fieldset class="group"><legend>…</legend>
+           <div class="form-grid">
+             <div class="field" style="--c4: 1 / span 2; --c2: 1 / span 2">label + .control</div>
+     A field's placement is written once per layout: --c4 (4 columns) and --c2 (2 columns).
+     Unset = auto placement, 1 column.
+*/
+
+:root {
+  --gut: 24px;            /* column gutter; also the input-table border-spacing */
+  --row-gap: 20px;        /* between rows inside a group (smaller than --group-gap) */
+  --group-gap: 40px;      /* between groups: proximity says "new group" */
+  --field-h: 48px;
+  --form-max: 880px;      /* 4 × ~202px + 3 × 24px; never stretch to the viewport */
+}
+
+/* ---------- the form's own width decides the column count, not the viewport ---------- */
+.form-shell { container-type: inline-size; max-width: var(--form-max); }
+
+.form { --cols: 2; --half-cols: 4; }
+@container (min-width: 720px) { .form { --cols: 4; --half-cols: 8; } }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gut);
+  row-gap: var(--row-gap);
+}
+.form-grid > .field { grid-column: var(--c2, auto / span 1); }
+@container (min-width: 720px) { .form-grid > .field { grid-column: var(--c4, auto / span 1); } }
+
+/* Half columns: a run of short related fields that needs half a column each uses a subdivision
+   of the same grid (every 4-column line is also an 8-column line). Place its fields with
+   --h8 / --h4 (8- and 4-track placements). */
+.form-grid--half { grid-template-columns: repeat(var(--half-cols), minmax(0, 1fr)); }
+.form-grid--half > .field { grid-column: var(--h4, auto / span 2); }
+@container (min-width: 720px) { .form-grid--half > .field { grid-column: var(--h8, auto / span 1); } }
+
+/* ---------- groups ---------- */
+.group { border: 0; padding: 0; margin: 0 0 var(--group-gap); min-width: 0; }
+.group > legend { font-weight: 700; font-size: 1.1rem; padding: 0 0 8px; margin-bottom: 16px; }
+.sub-title { font-weight: 700; margin: 0 0 12px; }   /* sub-group heading inside a group */
+.sub + .sub { margin-top: 28px; }
+
+/* ---------- field ---------- */
+.field { display: flex; flex-direction: column; min-width: 0; }
+.field > label { font-weight: 600; margin-bottom: 6px; }
+.hint { display: block; font-weight: 400; font-size: 0.875rem; }
+.field-error { display: block; font-weight: 600; color: var(--bad, #c4291c); }
+/* Labels/hints/errors of different heights in one row: push every control to the row
+   bottom so the input boxes stay on one horizontal line. */
+.control { margin-top: auto; position: relative; width: 100%; }
+.field input, .field select, .field textarea {
+  box-sizing: border-box; width: 100%; min-height: var(--field-h); font: inherit;
+}
+.control.has-unit input { padding-right: 3.5em; }
+.unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.is-invalid, [aria-invalid="true"] { border-color: var(--bad, #c4291c); border-width: 3px; }
+
+/* ---------- input table on the form grid ----------
+   N equal table columns = N grid columns. border-spacing = the gutter, and the table is
+   widened by one gutter per side so the outer cells land on the form edges.
+   REQUIRES: side padding >= --gut on the box around the form (page or card),
+   or the table sticks out of it. */
+.input-table {
+  width: calc(100% + 2 * var(--gut));
+  margin: 0 calc(-1 * var(--gut));
+  border-collapse: separate;
+  border-spacing: var(--gut) 8px;
+  table-layout: fixed;
+}
+.input-table caption { text-align: left; padding: 0 var(--gut) 4px; }
+.input-table th, .input-table td { padding: 0; vertical-align: middle; }
+.input-table thead th { text-align: left; vertical-align: bottom; }
+.input-table thead th.num { text-align: right; }
+.input-table td input { box-sizing: border-box; width: 100%; min-height: 40px; font: inherit; }
+.input-table td input.num { text-align: right; font-variant-numeric: tabular-nums; }
+.row-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* More than 3 inputs per row on a 4-column form: make the table 8 equal columns with
+   <colgroup><col span="8"></colgroup>; row label th colspan=2, a text input colspan=2,
+   numbers 1 each. A colspan=2 cell is exactly one form column (2 × col8 + gutter). */
+.row-error td { color: var(--bad, #c4291c); font-weight: 600; font-size: 0.875rem; }
+
+/* ---------- form + side panel (diagram / preview / summary) ---------- */
+/* DOM order: panel, then form-shell. Below 1100px: panel above the form, capped height
+   (add a hide toggle if it is tall). Wide: form left, panel right and sticky; placed by
+   column, not with `order`, so tab order still follows the screen. */
+.with-panel { display: grid; gap: 32px; grid-template-columns: minmax(0, var(--form-max)); }
+.with-panel > .panel svg { max-height: 260px; }
+@media (min-width: 1100px) {
+  .with-panel { grid-template-columns: minmax(0, var(--form-max)) minmax(320px, 1fr); align-items: start; }
+  .with-panel > .form-shell { grid-column: 1; grid-row: 1; }
+  .with-panel > .panel { grid-column: 2; grid-row: 1; position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow: auto; }
+  .with-panel > .panel svg { max-height: none; }
+}
+
+/* ---------- error summary ---------- */
+.error-summary { border: 3px solid var(--bad, #c4291c); padding: 16px 20px; margin-bottom: 32px; }
+[hidden] { display: none !important; }
+
+/* ---------- actions: primary first, left-aligned with the form edge ---------- */
+.actions { display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* dev aid: add class "show-guides" to .form-shell to paint the columns */
+.show-guides .form-grid, .show-guides .table-wrap {
+  background: repeating-linear-gradient(to right,
+    rgb(224 69 123 / .12) 0 calc((100% - (var(--cols) - 1) * var(--gut)) / var(--cols)),
+    transparent 0 calc((100% - (var(--cols) - 1) * var(--gut)) / var(--cols) + var(--gut)));
+}

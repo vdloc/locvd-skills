@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RC beam check</title>
+<link rel="stylesheet" href="form-grid.css">
+<style>
+  /* project skin: only colours and borders; layout comes from form-grid.css */
+  :root { --bad: #c4291c; --focus: #1a6fd6; --line: #d6d6d0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; background: #f6f6f4; color: #1d1d1b; }
+  main { padding: 32px 24px 80px; max-width: 1360px; margin: 0 auto; }  /* side padding >= --gut */
+  .group > legend { width: 100%; border-bottom: 1px solid var(--line); }
+  .field input, .field select, .input-table td input {
+    padding: 0 12px; background: #fff; border: 2px solid #8a8a84; border-radius: 4px;
+  }
+  .unit, .hint { color: #5c5c58; }
+  [aria-invalid="true"], .input-table td input[aria-invalid="true"] { border: 3px solid var(--bad); }
+  input:focus, select:focus { outline: 3px solid var(--focus); outline-offset: 0; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+  .panel svg { width: 100%; height: auto; display: block; }
+  button { font: inherit; font-weight: 700; min-height: 48px; padding: 0 24px; border-radius: 4px; border: 2px solid var(--focus); cursor: pointer; }
+  .primary { background: var(--focus); color: #fff; }
+  .secondary { background: transparent; color: inherit; border-color: #8a8a84; }
+  .link { border: 0; background: none; color: var(--focus); padding: 0 4px; min-height: 40px; }
+  .remove { min-height: 40px; width: 40px; padding: 0; border-color: transparent; background: none; font-weight: 400; }
+  .input-table tr.data { border-color: var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <h1>RC beam check</h1>
+  <div class="with-panel">
+    <aside class="panel" aria-labelledby="panel-title">
+      <h2 id="panel-title">Beam sketch</h2>
+      <svg viewBox="0 0 400 160" role="img" aria-labelledby="sketch-desc">
+        <rect x="20" y="60" width="360" height="24" fill="#9a9a9a"/>
+        <path d="M20 84 l-12 20 h24 z M380 84 l-12 20 h24 z" fill="#555"/>
+        <text x="200" y="130" text-anchor="middle" font-size="14">L</text>
+      </svg>
+      <p id="sketch-desc">Simply supported beam, b × h = 220 × 500 mm, span L = 6 m.</p>
+    </aside>
+
+    <div class="form-shell">
+      <form class="form" id="form" novalidate>
+        <div class="error-summary" id="summary" role="group" aria-labelledby="summary-title" tabindex="-1" hidden>
+          <h2 id="summary-title">There is a problem</h2>
+          <ul id="summary-list"></ul>
+        </div>
+
+        <fieldset class="group">
+          <legend>General</legend>
+          <div class="form-grid">
+            <!-- name: 2 columns (free text); floor + gridline: 1 column each -->
+            <div class="field" style="--c4: 1 / span 2; --c2: 1 / span 2">
+              <label for="name">Beam name</label>
+              <div class="control"><input id="name" name="name" value="B1" autocomplete="off"></div>
+            </div>
+            <div class="field" style="--c4: 3 / span 1; --c2: 1 / span 1">
+              <label for="floor">Floor</label>
+              <div class="control"><input id="floor" name="floor" value="3" inputmode="numeric"></div>
+            </div>
+            <div class="field" style="--c4: 4 / span 1; --c2: 2 / span 1">
+              <label for="gridline">Gridline <span class="hint" id="gridline-hint">For example 2–3/B</span></label>
+              <div class="control"><input id="gridline" name="gridline" value="2–3/B" aria-describedby="gridline-hint"></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 5 related fields on a 4-column grid: split by meaning (3 + 2), never fill the gap
+             with fields from another group and never stretch the orphan -->
+        <fieldset class="group">
+          <legend>Section</legend>
+          <div class="sub">
+          <p class="sub-title">Dimensions</p>
+          <div class="form-grid">
+            <div class="field" style="--c4: 1 / span 1; --c2: 1 / span 1">
+              <label for="b">Width b</label>
+              <div class="control has-unit"><input id="b" name="b" value="220" inputmode="decimal"><span class="unit" aria-hidden="true">mm</span></div>
+            </div>
+            <div class="field" style="--c4: 2 / span 1; --c2: 2 / span 1">
+              <label for="h">Depth h</label>
+              <div class="control has-unit"><input id="h" name="h" value="500" inputmode="decimal"><span class="unit" aria-hidden="true">mm</span></div>
+            </div>
+            <div class="field" style="--c4: 3 / span 1; --c2: 1 / span 1">
+              <label for="L">Span L</label>
+              <div class="control has-unit"><input id="L" name="L" value="6" inputmode="decimal"><span class="unit" aria-hidden="true">m</span></div>
+            </div>
+          </div>
+          </div>
+          <div class="sub">
+            <p class="sub-title">Cover</p>
+            <div class="form-grid">
+              <div class="field" style="--c4: 1 / span 1; --c2: 1 / span 1">
+                <label for="a">Bottom cover a</label>
+                <div class="control has-unit"><input id="a" name="a" value="40" inputmode="decimal"><span class="unit" aria-hidden="true">mm</span></div>
+              </div>
+              <div class="field" style="--c4: 2 / span 1; --c2: 2 / span 1">
+                <label for="a2">Top cover a′</label>
+                <div class="control has-unit"><input id="a2" name="a2" value="30" inputmode="decimal"><span class="unit" aria-hidden="true">mm</span></div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- input table: 4 equal columns = the 4 grid columns -->
+        <fieldset class="group">
+          <legend>Spans</legend>
+          <div class="table-wrap">
+            <table class="input-table" id="spans-table">
+              <caption id="spans-caption" tabindex="-1"></caption>
+              <thead>
+                <tr>
+                  <th scope="col" id="col-row">Span</th>
+                  <th scope="col" class="num" id="col-L">L (m)</th>
+                  <th scope="col" class="num" id="col-g">Dead load g (kN/m)</th>
+                  <th scope="col" class="num" id="col-p">Live load p (kN/m)</th>
+                </tr>
+              </thead>
+              <tbody id="spans-body"></tbody>
+            </table>
+          </div>
+          <button type="button" class="link" id="add-span">+ Add span</button>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="primary">Calculate</button>
+          <button type="button" class="secondary">Save draft</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  const COLS = [["L", "L (m)"], ["g", "Dead load g (kN/m)"], ["p", "Live load p (kN/m)"]];
+  const spans = [{ L: "6", g: "12.5", p: "8" }, { L: "4.5", g: "12.5", p: "6" }];
+  const body = document.getElementById("spans-body");
+  const num = v => { const t = String(v).trim().replace(",", "."); return t === "" || isNaN(+t) ? NaN : +t; };
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    n.append(...kids);
+    return n;
+  };
+
+  function problems(r) {
+    const out = [];
+    if (!(num(r.L) > 0)) out.push(["L", r.L.trim() ? "L must be a number greater than 0" : "Enter L"]);
+    for (const k of ["g", "p"]) if (!(num(r[k]) >= 0)) out.push([k, r[k].trim() ? `${k} must be 0 or more` : `Enter ${k}`]);
+    return out;
+  }
+
+  function caption() {
+    const total = spans.reduce((s, r) => s + (num(r.L) > 0 ? num(r.L) : 0), 0);
+    document.getElementById("spans-caption").textContent = `${spans.length} spans, total length ${Math.round(total * 100) / 100} m`;
+  }
+
+  function render() {
+    body.replaceChildren();
+    spans.forEach((r, i) => {
+      const n = i + 1;
+      // inputs are named by "Span n" + column header; the remove button stays out of the name
+      const head = el("div", { class: "row-head" }, el("span", { id: `span-${n}` }, `Span ${n}`));
+      if (spans.length > 1) {                       // Remove only when there is more than one row
+        const rm = el("button", { type: "button", class: "remove", "aria-label": `Remove span ${n}` }, "✕");
+        rm.addEventListener("click", () => {
+          spans.splice(i, 1); render();
+          document.getElementById("spans-caption").focus();   // focus lands somewhere meaningful
+        });
+        head.append(rm);
+      }
+      const tr = el("tr", { class: "data" }, el("th", { scope: "row" }, head));
+      for (const [k, label] of COLS) {
+        const input = el("input", {
+          id: `span-${n}-${k}`, name: `spans[${i}][${k}]`, value: r[k], class: "num", inputmode: "decimal",
+          "aria-labelledby": `span-${n} col-${k}`, "aria-describedby": `span-${n}-error`,
+        });
+        input.addEventListener("input", () => { spans[i][k] = input.value; caption(); });
+        tr.append(el("td", { "data-label": label }, input));
+      }
+      body.append(tr);
+      // the row error starts under column 2, on a grid line
+      const err = el("tr", { class: "row-error" }, el("td"), el("td", { colspan: "3", id: `span-${n}-error` }));
+      err.hidden = true;
+      body.append(err);
+    });
+    caption();
+  }
+
+  document.getElementById("add-span").addEventListener("click", () => {
+    const last = spans[spans.length - 1];
+    spans.push({ L: "", g: last.g, p: last.p });
+    render();
+    document.getElementById(`span-${spans.length}-L`).focus();      // focus the first new input
+  });
+
+  document.getElementById("form").addEventListener("submit", e => {   // submit event, not button click
+    e.preventDefault();
+    const list = document.getElementById("summary-list");
+    const summary = document.getElementById("summary");
+    list.replaceChildren();
+    spans.forEach((r, i) => {
+      const n = i + 1, ps = problems(r), bad = new Set(ps.map(p => p[0]));
+      for (const [k] of COLS) {
+        const input = document.getElementById(`span-${n}-${k}`);
+        bad.has(k) ? input.setAttribute("aria-invalid", "true") : input.removeAttribute("aria-invalid");
+      }
+      const cell = document.getElementById(`span-${n}-error`);
+      cell.textContent = ps.length ? `Span ${n}: ` + ps.map(p => p[1]).join("; ") : "";
+      cell.parentElement.hidden = !ps.length;
+      for (const [k, msg] of ps) list.append(el("li", {}, el("a", { href: `#span-${n}-${k}` }, `Span ${n}: ${msg}`)));
+    });
+    summary.hidden = !list.children.length;
+    if (list.children.length) summary.focus();
+    document.title = (list.children.length ? `(${list.children.length} errors) ` : "") + "RC beam check";
+  });
+
+  // summary links must move focus into the field, not just scroll to it
+  document.getElementById("summary-list").addEventListener("click", e => {
+    const a = e.target.closest("a"); if (!a) return;
+    e.preventDefault();
+    const input = document.getElementById(a.hash.slice(1));
+    input.scrollIntoView({ block: "center" }); input.focus({ preventScroll: true });
+  });
+
+  render();
+</script>
+</body>
+</html>
