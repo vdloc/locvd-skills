@@ -37,7 +37,11 @@ LLM auditors fail in known ways: false positives about interactions they never r
 ## Audit workflow
 1. **Frame**: users and top 3 tasks; platform; screen types (overview / focus / make / do [TID]); constraints (brand, design system, WCAG target, default 2.2 AA). Note whether the product serves mainly **existing users** (radical changes to learned navigation and interaction cost them) or **new users** (redesign freely) [NAT], and what the business needs users to do [MAR].
 2. **Inventory**: list the screens/routes and states in scope: empty, loading, error, success, long and ugly data, logged-out, each theme [DUI]. Audit states, not just the default render.
-3. **Collect evidence**: follow [evidence.md](evidence.md). Live or dev-server targets: screenshots at 375/768/1280 px in each theme, accessibility snapshot, then run the scripts in `scripts/`: `metrics.js` (type, contrast, targets, spacing), `style-inventory.js` (style, colour, radius, border, shadow, control-height census), `alignment-grid.js` (edge and gap counts), and `form-layout.js` on any form. Static files or screenshots: derive the same facts from the source, or mark the check *needs verification*. Never invent a measurement.
+3. **Collect evidence**: follow [evidence.md](evidence.md). Live or dev-server targets: screenshots at 375/768/1280 px in each theme, then run the scripts in `scripts/`:
+   - **Page facts**: `metrics.js` (type, contrast, targets, names, spacing), `style-inventory.js` (style, colour, radius, border, shadow, control-height census), `alignment-grid.js` (edge and gap counts), `form-layout.js` on any form, `axe-run.js` (axe with WCAG 2.2 rules on).
+   - **What a keyboard and screen-reader user meets**: `a11y-transcript.js` (role · name · state of every element in Tab order) and `focus-walk.js` (visible focus, focus hidden under sticky/fixed layers).
+   - **WCAG 2.2 procedures**: `text-spacing.js`, `live-regions.js` (around an action), `wcag22-inventory.js` (login fields and paste blocking, drag-only widgets, help placement, re-asked data).
+   Static files or screenshots: derive the same facts from the source, or mark the check *needs verification*. Never invent a measurement.
 4. **Walk the top tasks** (the step automated and LLM review skip). For each top task:
    - **Control and freedom**: try Back, Cancel, Esc, Undo and closing each overlay; check that nothing traps you or loses input.
    - **Recognition over recall**: are options, current values and context visible, or must the user remember them from a previous screen?
@@ -45,7 +49,7 @@ LLM auditors fail in known ways: false positives about interactions they never r
    - **Error recovery**: trigger validation (dev or non-persisting forms only), then read the message, its placement and focus behaviour.
    - **Keyboard**: Tab through the task; note order, visible focus, traps.
    Record these as *Observed*. If you cannot run the UI, list them under *Needs verification*.
-5. **Run the lenses in order** (structure before paint). Load the chapter, test its checks against the evidence:
+5. **Find** (pass 1): run the lenses in order (structure before paint). Load the chapter and test its checks against the evidence. For accessibility, read the `a11y-transcript.js` output line by line and ask, in plain words, whether each element's role, name and state would make sense to someone hearing it, compared with its neighbours (more effective than quoting WCAG text). Record candidates fast; judge severity later.
 
    | # | Lens | Chapter | # | Lens | Chapter |
    |---|---|---|---|---|---|
@@ -60,22 +64,31 @@ LLM auditors fail in known ways: false positives about interactions they never r
    | 9 | Lists, tables, data | ch11 | 19 | Ethics & deceptive patterns | ch20 |
    | 10 | Components & system | ch12 | 20 | Foundations sanity check | ch01 |
 
-6. **Record each finding**: ID · severity with its one-line reason (e.g. "High: fails WCAG 1.4.11 on every checkout field") · evidence tag · where (screen, breakpoint, selector) · evidence (measurement or what you did and saw) · rule (check ID / source) · user impact · fix (concrete, token-level) · effort (S/M/L).
-7. **Verify and deduplicate** (repeat until clean):
-   - Each Critical/High: is the evidence tag Measured or Observed, and is the element named? If not, downgrade to Medium and move it to *Needs verification*.
-   - Merge findings that share one cause; delete any that the evidence contradicts (e.g. `alt=""` on a decorative image is correct).
-   - Each severity has its reasoning written down.
-8. **Diagnose root causes** [MAR][DUI]: cluster the symptoms; for each cluster, name the most likely cause that explains the most findings and the fix at token or component level. Order fixes by severity × reach, and put widespread, cheap fixes first.
-9. **Report** using the template below.
+6. **Localize** (pass 2): give every finding its evidence and place: where (screen, breakpoint, selector), the measurement or what you did and saw, the evidence tag, the rule (check ID / source), user impact, fix (concrete, token-level), effort (S/M/L). For findings taken from screenshots, run `mark-elements.js`, re-take the screenshot, and cite the mark number with its selector.
+7. **Consolidate** (pass 3), repeating until clean:
+   - Merge findings that share one cause; one finding per root defect.
+   - Delete any that the evidence contradicts (e.g. `alt=""` on a decorative image is correct).
+   - Any finding without a named element or evidence is rewritten or dropped.
+8. **Rate severity** (pass 4, separate from finding): go through the consolidated list once more and score each finding with the *Severity* factors below, writing the one-line reason (e.g. "High: fails WCAG 1.4.11 on every checkout field"). A finding scored "not a problem" is deleted. Inferred findings stop at Medium and go to *Needs verification*.
+9. **Diagnose root causes** [MAR][DUI]: cluster the symptoms; for each cluster, name the most likely cause that explains the most findings and the fix at token or component level. Order fixes by severity × reach, and put widespread, cheap fixes first.
+10. **Report** using the template below.
 
 ### Severity
-Start from **impact**, then adjust one level for **frequency/reach** (core path every visit, or most users → up; rare path → down) and **persistence** (repeated pain → up; learnable once → down). Any WCAG A/AA failure is at least **High**; it is **Critical** when it stops some users from completing a core task. Inferred findings stop at Medium.
+Rate after all findings are collected, from the consolidated list: one evaluator's ratings made while hunting are unreliable [NN/g]. Score three factors, then apply the floors.
+
+| Factor | Values |
+|---|---|
+| **Impact** | blocks the task or loses data/money (4) · causes errors or excludes a user group (3) · slows or confuses (2) · cosmetic (1) · not a problem (0 → delete) |
+| **Reach** | core path, most users or every visit (+1) · some users or screens (0) · rare path (−1) |
+| **Persistence** | hits users every time (+0) · learnable once, easy workaround (−1) |
+
+Total 5 = Critical, 4 = High, 2–3 = Medium, 1 or less = Low (impact 0 is deleted whatever the total). Examples: unlabeled checkout field 4+1+0 = 5; colour-only error 3+1+0 = 4; vague link text 2+0+0 = 2; shadow inconsistency 1+0+0 = 1. The factor total decides the level; the examples in the table below are illustrations and never raise a score. Floors and caps: any WCAG A/AA failure is at least **High**, and **Critical** when it stops some users from completing a core task; Inferred findings are capped at Medium.
 
 | Level | Impact | Examples |
 |---|---|---|
-| **Critical** | Blocks a core task (for everyone or for a group such as keyboard or screen-reader users), or causes loss of data or money | unlabeled fields, keyboard trap, body text below 3:1, zoom disabled, destructive action without recovery |
-| **High** | Any other WCAG A/AA failure on a core flow; significant errors, confusion or exclusion; blocks a secondary task | colour-only errors (1.4.1), targets under 24 px (2.5.8), disabled submit without reason, two primaries, hidden nav |
-| **Medium** | Friction, inconsistency, slower scanning | off-scale spacing, ten font sizes, vague link text, weak hierarchy |
+| **Critical** | Blocks a core task (for everyone or for a group such as keyboard or screen-reader users), or causes loss of data or money | unlabeled fields, keyboard trap, focus indicator removed on a core flow, body text below 3:1, zoom disabled, destructive action without recovery |
+| **High** | Any other WCAG A/AA failure on a core flow; significant errors, confusion or exclusion; blocks a secondary task | colour-only errors (1.4.1), targets under 24 px (2.5.8), status messages not announced (4.1.3), unexplained disabled button on a secondary flow |
+| **Medium** | Friction, inconsistency, slower scanning | two competing primary buttons, nav hidden behind a hamburger on desktop, off-scale spacing, ten font sizes, vague link text |
 | **Low** | Polish | shadow inconsistency, minor misalignment, missing empty-state delight |
 
 ### Report template
@@ -212,7 +225,7 @@ Method limit: expert review; findings are predictions to validate with users, no
 
 ## Supporting files
 - [evidence.md](evidence.md): Playwright MCP evidence sequence, how to run the scripts, how to read their output
-- `scripts/metrics.js`, `scripts/style-inventory.js`, `scripts/alignment-grid.js`, `scripts/form-layout.js`: page functions for `browser_evaluate` (see evidence.md)
+- `scripts/`: 11 page functions for `browser_evaluate` (metrics, style inventory, alignment grid, form layout, axe run, accessibility transcript, focus walk, text spacing, live regions, WCAG 2.2 inventory, element marks); evidence.md says when to run each and how to read it
 - [cheatsheet.md](cheatsheet.md): thresholds, decision rules, source conflicts, smell → problem map
 - [patterns.md](patterns.md): ~90 named patterns (Tidwell + RUI/PUI techniques) with when/how
 - [glossary.md](glossary.md): terms with chapter refs

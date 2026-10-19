@@ -68,6 +68,13 @@ Accessibility is usability for everyone, including temporary and situational lim
 | A15 | Motion & time | Respects reduced motion; no flashing; timeouts extendable | (WCAG; TID animation guidance) |
 | A16 | Custom widgets | Follow ARIA APG keyboard models (menus, tabs, dialogs, comboboxes) | WSG |
 | A17 | High contrast | Usable in forced-colors mode (borders/icons don't vanish) | TID, WSG |
+| A18 | Focus not obscured | No focused control is entirely hidden by a sticky header, fixed footer, cookie banner or chat button (`focus-walk.js`; confirm with real Tab + screenshot); fix with `scroll-padding-top/bottom` equal to the layer height | WCAG 2.4.11 |
+| A19 | Text spacing | No text clipped or overlapping with line height 1.5, letter spacing 0.12em, word spacing 0.16em, 2em after paragraphs (`text-spacing.js`); avoid fixed heights with `overflow:hidden` on text | WCAG 1.4.12 |
+| A20 | Accessible authentication | Password/OTP fields allow paste and carry `autocomplete="current-password"` / `"one-time-code"`; no transcription or puzzle test without an alternative (`wcag22-inventory.js`) | WCAG 3.3.8 |
+| A21 | Dragging alternatives | Every drag interaction (reorder, slider, resize, map pan) has a single-pointer alternative: buttons, inputs or a menu | WCAG 2.5.7 |
+| A22 | Consistent help | Help mechanisms (contact, chat, help link) keep the same relative order across pages (compare `wcag22-inventory.js` on 3+ pages) | WCAG 3.2.6 |
+| A23 | Status messages announced | Results, errors and progress that appear without focus change reach a `role=status`/`alert` or `aria-live` region (`live-regions.js` around the action) | WCAG 4.1.3 |
+| A24 | No redundant entry | Data entered earlier in a flow is pre-filled or selectable later ("same as billing"), except where re-entry is essential or for security | WCAG 3.3.7 |
 
 ## Fix Recipes
 ```html
