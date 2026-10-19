@@ -4,3 +4,4 @@
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cp "$here/checkout.html" ./checkout.html
+if [ "${1:-}" = "account" ]; then cp "$here/account.html" ./account.html; fi

@@ -37,3 +37,24 @@ This file is never copied into a run's workspace.
 No script ships with the page (`applyCoupon` is undefined). Claims about what happens after
 "Pay now", loading states, or confirmation messages cannot be verified from this file, so a
 correct audit marks them unverified rather than rating them Critical or High.
+
+# account.html — seeded ground truth
+
+Used by `ui-ux-audit-playbook--static-account-wcag22`. Tests the WCAG 2.2 procedures (focus-walk, text-spacing, live-regions, wcag22-inventory).
+
+| # | Defect | Where | Check |
+|---|---|---|---|
+| E1 | Fixed cookie bar (~150 px) covers focused controls near the bottom of the viewport; no `scroll-padding-bottom` | `.cookie` over `#pw`, `#otp`, "Change password", "Billing history" | A18, 2.4.11 |
+| E2 | Focus indicator removed on the primary button (`.btn:focus { outline: none }`, nothing else changes) | `#save` | A2, 2.4.7 |
+| E3 | Card title in a fixed 24 px box with `overflow:hidden`, clipped under text-spacing overrides | `h2.card-title` | A19, 1.4.12 |
+| E4 | Paste blocked on the password field (`paste` handler calls `preventDefault`) and no `autocomplete="current-password"` | `#pw` | A20, 3.3.8 |
+| E5 | "Profile saved" toast is injected without a live region (the separate `#status` line is announced) | `.toast` | A23, FB4, 4.1.3 |
+| E6 | Dashboard order is drag-only (`draggable=true` list items, not focusable, no buttons) | `.list li` | A21, 2.5.7 |
+
+## Traps (correct as written)
+
+| # | Element | Why it is correct |
+|---|---|---|
+| U1 | `#status` with `role="status"` | announces "Last saved just now" |
+| U2 | `#otp` with `autocomplete="one-time-code"` and no paste handler | allows autofill and paste |
+| U3 | `.btn--quiet:focus` outline | visible focus on the secondary buttons |

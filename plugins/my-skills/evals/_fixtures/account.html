@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account settings · Acme</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0; color: #1a1a1a; background: #fff; }
+  header { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #ccc; padding: 12px 24px; }
+  main { max-width: 640px; margin: 0 auto; padding: 24px 24px 200px; }
+  .cookie { position: fixed; left: 0; right: 0; bottom: 0; height: 120px; background: #222; color: #fff; padding: 16px 24px; }
+  .cookie button { margin-top: 8px; }
+  .card { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+  .card-title { height: 24px; width: 230px; overflow: hidden; font-size: 16px; line-height: 24px; font-weight: 600; margin: 0 0 8px; }
+  label { display: block; font-weight: 600; margin-top: 16px; }
+  input { font: inherit; padding: 8px 12px; border: 1px solid #767676; border-radius: 4px; width: 100%; box-sizing: border-box; }
+  a:focus, input:focus { outline: 3px solid #0b5fff; outline-offset: 2px; }
+  .btn { font: inherit; padding: 10px 16px; border-radius: 6px; border: 2px solid #0b5fff; background: #0b5fff; color: #fff; margin-top: 16px; }
+  .btn:focus { outline: none; }
+  .btn--quiet { background: #fff; color: #0b5fff; }
+  .btn--quiet:focus { outline: 3px solid #0b5fff; outline-offset: 2px; }
+  .list li { padding: 8px; border: 1px solid #ccc; margin: 4px 0; cursor: grab; list-style: none; }
+  .toast { position: fixed; top: 16px; right: 16px; background: #222; color: #fff; padding: 12px 16px; border-radius: 6px; }
+  .spacer { height: 600px; }
+  footer { padding: 24px; border-top: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<header><a href="/">Acme</a> · <a href="/account">Account</a></header>
+<main>
+  <h1>Account settings</h1>
+
+  <section class="card" aria-labelledby="t-profile">
+    <h2 class="card-title" id="t-profile">Profile and contact details</h2>
+    <label for="name">Full name</label>
+    <input id="name" name="name" autocomplete="name">
+    <button class="btn" id="save" type="button">Save profile</button>
+    <p id="status" role="status"></p>
+  </section>
+
+  <section class="card" aria-labelledby="t-security">
+    <h2 id="t-security">Security</h2>
+    <label for="pw">Current password</label>
+    <input id="pw" name="pw" type="password">
+    <label for="otp">Verification code</label>
+    <input id="otp" name="otp" inputmode="numeric" autocomplete="one-time-code">
+    <button class="btn btn--quiet" type="button">Change password</button>
+  </section>
+
+  <section class="card" aria-labelledby="t-order">
+    <h2 id="t-order">Dashboard order</h2>
+    <p>Drag to reorder your dashboard widgets.</p>
+    <ul class="list">
+      <li draggable="true">Invoices</li>
+      <li draggable="true">Usage</li>
+      <li draggable="true">Team</li>
+    </ul>
+  </section>
+
+  <div class="spacer"></div>
+  <a href="/billing">Billing history</a>
+</main>
+<footer><a href="/help">Contact support</a></footer>
+<div class="cookie">We use cookies. <button type="button" class="btn btn--quiet">Accept</button></div>
+<script>
+  document.getElementById('pw').addEventListener('paste', e => e.preventDefault());
+  document.getElementById('save').addEventListener('click', () => {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = 'Profile saved';
+    document.body.appendChild(t);
+    document.getElementById('status').textContent = 'Last saved just now';
+  });
+</script>
+</body>
+</html>
