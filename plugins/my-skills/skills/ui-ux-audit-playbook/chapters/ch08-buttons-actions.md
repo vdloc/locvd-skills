@@ -2,6 +2,20 @@
 
 Sources: [PUI] ch7 · [RUI] "Semantics are secondary" · [KUL] buttons · [TID] ch8 · [WSG] ch7
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Actions need a visible hierarchy (one primary, some secondary, few tertiary) that doesn't depend on colour, labels that say exactly what happens (verb + noun), generous targets, predictable placement, all states, and friction proportional to how destructive an action is — with undo preferred over nagging.
 
@@ -27,6 +41,7 @@ Actions need a visible hierarchy (one primary, some secondary, few tertiary) tha
 - **Buttons vs links** [WSG]: links navigate, buttons act; a link styled as a button still behaves like a link (Space scrolls) → use `<button>` for actions, `<a href>` for navigation.
 - **Action presentation patterns** [TID]: *Button Groups* (2–5 related actions, same treatment, don't mix scopes, beside the objects they affect — bottom of long lists is a blind spot) · *Hover/Pop-up Tools* (desktop only; instant, no reflow) · *Action Panel* (always-visible task-grouped actions) · *Preview* before costly actions · *Spinners & Loading Indicators* · *Cancelability* · *Multilevel Undo* · *Command History* · *Macros*. Drop-down controls are for choosing values, not triggering actions [TID].
 - **Response-time thresholds** [TID]: <0.1s feels instant · 0.1–1s noticeable, flow kept · >1–2s show indicator · ~10s attention limit → progress with % / time remaining / what's happening / Cancel. Frustration threshold ~10s [WSG].
+- **Constructive vs destructive actions** [MAR]: actions that add value get high visibility near where they are needed; destructive actions get low *probability* (quiet style, placed off the reflex path) but are never hidden; make-or-break actions may earn a unique design. Hiding cancel/delete is obstruction (ch20 ET1).
 
 ## Key Concepts
 - **Action hierarchy / button weights**.

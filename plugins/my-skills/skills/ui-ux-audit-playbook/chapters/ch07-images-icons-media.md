@@ -2,6 +2,20 @@
 
 Sources: [RUI] "Working with Images" · [PUI] ch3–5 · [TID] ch5 · [WSG] ch11–12, ch6–7 · [KUL] hero visuals, cards
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Images must earn their weight: good photography sized for its slot, text on images with guaranteed contrast, icons drawn for their display size in one consistent style (and labelled), meaningful alt text, responsive delivery, and media the user controls.
 

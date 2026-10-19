@@ -2,6 +2,10 @@
 
 Sources: [PUI] ch8 · [TID] ch10 · [KUL] forms · [WSG] ch7 · [RUI] "Avoid ambiguous spacing" | **Derived sources** (not in the five books, see [research/form-page-layout-principles.md](../research/form-page-layout-principles.md)): Wroblewski/Penzo eye-tracking research, Baymard Institute field studies, NN/g articles, Apple HIG, Material Design 3, WCAG 2.2 — marked "(derived; not in source books)" in Audit Checks below
 
+## Contents
+Core idea · Frameworks · Key concepts · Mental models · Audit checks (FM1–FM26) · Fix recipes (incl. shared rows, input tables, side panel) · Conflicts · Anti-patterns · Worked example · Takeaways
+
+
 ## Core Idea
 Forms are work you ask of users: ask for less, lay it out as one clear downward path, label everything visibly, choose the control that minimises effort for the data type, prevent errors before they happen, and when they do, say exactly what went wrong, where, and how to fix it.
 
@@ -88,6 +92,12 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
 | FM18 | Width as grouping signal | Related fields sharing a row (name parts, address parts) use consistent widths within the group, distinct from unrelated groups | Apple HIG (derived; not in source books) |
 | FM19 | Tab order | Focus order through fields follows visual/logical reading order, not DOM-arbitrary order | Apple HIG, WCAG SC 1.3.2 |
 | FM20 | Required/optional grouping | Required and optional fields spatially grouped apart, not interleaved, independent of marking convention | Tullis & Pons 1997 via Bargas-Avila et al. 2010 (derived; not in source books) |
+| FM21 | Shared rows | A row holds ≤3 inputs, only parts of one entity (name parts, city/state/ZIP, expiry/CVC); input boxes share one top line even when labels, hints or errors differ in height | Baymard, Carbon (derived) |
+| FM22 | Width tokens & column cap | Input widths come from content-length tokens snapped to the grid, implemented as `max-width` + `width:100%`; unknown-length text fills the form column; the form column is capped (~640px / two-thirds of a 960px layout) | GOV.UK, USWDS, Carbon (derived) |
+| FM23 | Groups & sections | Multi-input entities in `fieldset`/`legend`; sections have headings sized between label and form title; gap between sections clearly larger than between fields | NN/g, Carbon (derived), PUI |
+| FM24 | Side panel (diagram, preview, summary) | Desktop: form in the main ~2/3 column, panel in ~1/3, never shared with fields; sticky only if it fits the viewport (else `max-height` + scroll); tablet: one column with deliberate source order (explaining diagram before the form, review summary after) | Material, Carbon (derived) |
+| FM25 | Repeating items | Pattern fits item size: table of inputs (few columns), stacked numbered groups (3–6 fields), add-to-a-list loop (long items); table uses fixed layout with content-based column widths, Remove in the last column, Add below aligned to the first column; every cell input has an accessible name from row + column headers | MOJ, GOV.UK (derived), WCAG 1.3.1 |
+| FM26 | Error placement | Error summary at the top of the form column, linked, in form order; one inline-message position per form (between label and input, or below input), never mixed, never inside the input; an error never shifts row neighbours; one message per grouped entity | GOV.UK, Material, Etre (derived) |
 
 ## Fix Recipes
 ```html
@@ -122,6 +132,37 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
 6. **Vague error "Invalid input"** → specific cause + example + fix.
 7. **Long survey on one page** → 5–7 themed steps, progress "Step 2 of 4", review screen.
 
+### Shared rows, input tables, side panel (FM21–FM26)
+For a full layout refactor (grid spans, row overflow, subgrid alignment, breakpoints) use the **`refactoring-web-form-layout`** skill if it is installed; it carries the primary-source evidence behind FM21–FM26.
+```css
+.form-grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:24px; max-width:40rem; }
+.field--row { display:grid; grid-template-rows:subgrid; grid-row:span 3; }   /* label · input · message share rows across the line */
+.form-row { display:grid; grid-template-columns:subgrid; grid-column:1 / -1; grid-template-rows:auto auto auto; }
+.input--postcode { max-width:10ch; width:100%; }                              /* content token, never overflows */
+.layout--with-panel { display:grid; grid-template-columns:2fr 1fr; gap:32px; }
+.layout--with-panel aside { position:sticky; top:var(--header-h); max-height:calc(100vh - var(--header-h)); overflow:auto; }
+.form-wrap { container: form / inline-size; }                              /* query the form's own width (panels, modals) */
+@container form (max-width: 640px) { .form-grid { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+@media (max-width: 839px) { .layout--with-panel { grid-template-columns:1fr; } }
+.input-table { table-layout:fixed; width:100%; border-spacing:24px 8px; }
+.input-table input { width:100%; }
+```
+```html
+<table class="input-table">
+  <caption>Spans</caption>
+  <colgroup><col style="width:25%"><col><col><col></colgroup>
+  <thead><tr><th id="h-span">Span</th><th id="h-len">Length (m)</th><th id="h-dead">Dead load (kN/m)</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+  <tbody><tr>
+    <th id="r1" scope="row">Span 1</th>
+    <td><input id="len1" aria-labelledby="r1 h-len" inputmode="decimal"></td>
+    <td><input id="dead1" aria-labelledby="r1 h-dead" inputmode="decimal"></td>
+    <td><button type="button" aria-label="Remove span 1">Remove</button></td>
+  </tr></tbody>
+</table>
+<button type="button">Add span</button>
+```
+Tablet: if columns no longer fit, scroll the table inside its own container or switch to stacked numbered groups; never let the page scroll sideways.
+
 ## Conflicts & Context
 - **Required vs optional marking** — [PUI] both; [KUL] minority/optional only; [TID] NN/g all required vs gov standards optional-only. Recommendation: pick one per product; if most fields are required, mark optional "(optional)" and state "All fields required unless marked optional" *only* if testing shows people read it; otherwise PUI's asterisk + note. Always programmatic `required`. **Tension**: PUI specifies the asterisk "not red," but Pauwels et al. (2009), via Bargas-Avila et al. (2010), found colour-highlighted required fields outperformed asterisk-only on speed, errors, and satisfaction in a controlled study. Not resolved here — flag as a candidate to A/B test rather than overturning PUI's default.
 - **Radios vs dropdown thresholds** — ≤10 [PUI], 4–6 [WSG], dropdown >5 [KUL]. Use radios up to ~5 always, ~6–10 when vertical space allows.
@@ -152,4 +193,4 @@ Forms are work you ask of users: ask for less, lay it out as one clear downward 
 6. Chunk long forms with progress, review and success.
 
 ## Connects To
-- **ch08** buttons & disabled states · **ch13** error copy · **ch15** labels/ARIA/focus · **ch03** spacing, L14 diagram-proximity/reading-order (general case of FM16/FM19)
+- **ch08** buttons & disabled states · **ch13** error copy · **ch15** labels/ARIA/focus · **ch03** spacing, L14 diagram-proximity/reading-order (general case of FM16/FM19) · **ch16** error summary & status announcements · **`refactoring-web-form-layout`** skill (layout refactors)

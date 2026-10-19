@@ -2,6 +2,20 @@
 
 Sources: [KUL] cards, modals, dropdowns, hero, pricing, search, style guides · [PUI] ch1 design system, ch3 tokens · [TID] ch4, ch11 · [WSG] ch7–8 pattern libraries · [RUI] systems, empty states
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Consistency at scale comes from a system: tokens (colour, type, spacing, radius, shadow) → reusable components with every state → documented usage guidelines → templates. Component-level best practice (cards, modals, dropdowns, tabs, accordions, hero, pricing, search, empty states) is where most audit findings land.
 

@@ -1,6 +1,20 @@
 # Ch 03: Layout, Spacing, Grouping & Grids
 
-Sources: [RUI] "Layout and Spacing" · [PUI] ch4 · [KUL] layouts/grids/box model · [TID] ch4 · [WSG] ch6, ch8 | **Derived sources** (not in the five books, see [research/form-page-layout-principles.md](../research/form-page-layout-principles.md) in ui-ux-audit-playbook): Chang/Dooley/Tuovinen Gestalt screen-design paper, NN/g proximity articles, WCAG 2.2 — marked "(derived; not in source books)" in Audit Checks below
+Sources: [RUI] "Layout and Spacing" · [PUI] ch4 · [KUL] layouts/grids/box model · [TID] ch4 · [WSG] ch6, ch8 · [FRZ] 11.7 design grid · [DUI] ch27 UI audit | **Derived sources** (not in the five books, see [research/form-page-layout-principles.md](../research/form-page-layout-principles.md) in ui-ux-audit-playbook): Chang/Dooley/Tuovinen Gestalt screen-design paper, NN/g proximity articles, WCAG 2.2 — marked "(derived; not in source books)" in Audit Checks below
+
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
 
 ## Core Idea
 Space is a design material: a constrained, non-linear spacing scale plus the rule "more space between groups than within them" produces order, grouping and hierarchy without extra boxes or lines.
@@ -18,6 +32,8 @@ Space is a design material: a constrained, non-linear spacing scale plus the rul
 - **Relative sizing doesn't scale** [RUI]: large elements shrink faster than small ones on small screens (h1 45px/body 18 desktop → 20–24px/14 mobile); larger buttons get proportionally more padding, smaller get tighter.
 - **Alignment** [PUI][KUL][TID]: keep a straight left edge (icons above text rather than breaking it); avoid mixed alignments in one component; baseline-align mixed font sizes on a line ("$10 /month"); similar components share height on one line; elements shouldn't shift between screens.
 - **Ensure the interface is unbreakable** [PUI]: design for long names, big numbers, empty & overflow; reflow instead of hiding; if truncating, keep distinguishing parts (middle truncation).
+- **Design-grid count** [FRZ]: draw a vertical line at the left and right edge of every element and count the distinct lines; draw horizontal lines at the top and bottom of every element and count the distinct gap values. Fewer lines and fewer distinct gaps = a calmer, more orderly screen (their example: 10 vs 3 vertical lines, 6 vs 3 distances). Use it as a before/after measure; `scripts/alignment-grid.js` automates it.
+- **Soft grid** [DUI]: with no defined grid, take the most common side margin (mobile ≥16px; common values 10/12/15/16/20/24) and the next spacing that is a multiple of it; deviations of a few px from those values go on the inconsistency list. Misalignment repeated on several screens is usually one global fix: do it first.
 - **Screens of information** [WSG]: judge a page in viewport-high zones; top zone densest; keep critical content within ~600–700px on desktop.
 
 ## Key Concepts
@@ -52,6 +68,7 @@ Space is a design material: a constrained, non-linear spacing scale plus the rul
 | L12 | Touch spacing | ≥8pt between adjacent targets (16pt safe); each target itself ≥24×24 CSS px (WCAG 2.2 SC 2.5.8 Target Size Minimum), unless spaced so a 24px circle centred on it clears neighbours, an equivalent-size control exists elsewhere, or the target is inline text | PUI, WCAG SC 2.5.8 |
 | L13 | Split-pane ratio safe | In any flex/grid region with an unbounded-growth sibling (`flex-grow`/`fr` with no cap) next to a fixed-purpose sibling (controls, actions, tools), check both at a short/constrained container size: does the growth sibling stop at a sane cap, and does the fixed sibling keep a floor + visible scroll affordance instead of being pushed off-screen? Test at the shortest realistic window height, not just narrow width. | (derived; not in source books) |
 | L14 | Diagram proximity & reading order | An explanatory image/diagram sits within the visual proximity group of the element it explains (not a separate help panel); its DOM/reading order matches its visual adjacency, or an equivalent text alternative appears in sequence — check `browser_snapshot`'s accessibility-tree order against visual position, especially where CSS grid/flex `order` or absolute positioning could move it visually without moving it in the DOM | WCAG SC 1.3.2 (derived; not in source books) |
+| L15 | Few alignment lines, few gap values | Within a region, edges a few px apart are merged onto one line and vertical gaps come from the spacing scale; no single-use edges or gaps without reason (measure with `scripts/alignment-grid.js`; compare before/after) | FRZ, DUI |
 
 ## Fix Recipes
 1. **Define scale tokens** (pick one and stick to it):

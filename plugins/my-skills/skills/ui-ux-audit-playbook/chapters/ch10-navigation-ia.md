@@ -2,6 +2,20 @@
 
 Sources: [TID] ch2–3 · [WSG] ch4, ch6–7 · [PUI] ch2 · [KUL] navigation, search
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Structure before screens: organise content in user vocabulary with mutually exclusive categories, keep navigation distances short, and give every page clear "you are here" signposts, a way back, and search — so users can orient, choose a route, and recognise arrival.
 
@@ -23,6 +37,8 @@ Structure before screens: organise content in user vocabulary with mutually excl
 - **No dead-end pages** [WSG]: every page links home + main sections; users land deep from search.
 - **Search UX** [KUL][PUI][TID]: prominent if core; recent searches (clear all / remove one); reset query; Cancel returns; placeholder with example queries; autocomplete/suggestions; helpful no-results page (related results, spelling, popular); highlight matched terms.
 - **Every page needs** [WSG]: informative `<title>` (Page — Section — Site), visible h1, owner/author, date, home link, link to parent section, contact info or link.
+- **Order follows use** [MAR]: users meet menu items in order and click the first plausible one, so the first items get the most clicks; order by frequency or a clear scheme, and treat a mismatch between UI order and analytics order as a symptom to diagnose (ch17 IX12).
+- **Web-app sidebar zones** [UXM]: content destinations at the top of the sidebar, administrative items (settings, billing) at the bottom left, personal/account items top right; search in the header, not inside the sidebar (it reads as filtering the sidebar); group long sidebars under headings or dividers; mega-menu secondary levels open on click, not hover.
 
 ## Key Concepts
 - **Information architecture (IA)**; **taxonomy**; **controlled vocabulary**.

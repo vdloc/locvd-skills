@@ -42,7 +42,7 @@ Every UI detail needs a logical, defensible reason tied to how people perceive, 
 | F2 | Primary task path is short | Common task possible without detours; related actions adjacent to their object | PUI, TID |
 | F3 | Choices are bounded | No screen forces choice among a long undifferentiated list; recommended/popular options highlighted | PUI |
 | F4 | Conventional patterns used | Links look like links, checkboxes square, inputs = labelled rectangles; platform guidelines followed unless inaccessible | PUI, WSG |
-| F5 | Consistency | Same-looking things behave the same; same function looks the same across screens; icons one style | PUI, TID, KUL |
+| F5 | Consistency | Same-looking things behave the same; same function looks the same across screens; icons one style (full check: ch17 IX7–IX10, concept/action/appearance × internal/external) | PUI, TID, KUL, NIE |
 | F6 | All interaction states exist | default/hover/active/focus/disabled(+loading/error) designed for every interactive element | PUI, KUL |
 | F7 | Safe exploration | Undo or recovery for destructive/expensive actions; Back behaves predictably; escape hatch from dead ends | TID, WSG |
 | F8 | No blocking before value | No forced sign-up/instructions/splash before first useful action | TID |

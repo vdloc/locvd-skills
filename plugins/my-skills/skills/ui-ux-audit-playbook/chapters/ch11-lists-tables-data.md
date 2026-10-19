@@ -24,6 +24,8 @@ Choose list and data presentations from the *use case* (overview, browse, find, 
 - **Dashboard** [TID][KUL]: decide what users must monitor/act on; remove non-actionable data; strongest visual hierarchy for key metrics; one screen with little scrolling; group in Titled Sections; tabs only if side-by-side comparison isn't needed; drilldown; simple line/bar charts beat gauges, dials, pies, 3D bars; tables when numbers matter; highlight key numbers; consider customisation (Movable Panels). Info cards: label, value, delta with ▲▼ icon + colour [KUL][RUI].
 - **Graphics ethics** [WSG]: don't distort data; don't cherry-pick; trust readers; captions + data tables for accessibility.
 - **Colour in data** [RUI][TID]: don't rely on hue alone — vary lightness; direct labels; icons for up/down.
+- **Tables on small screens** [UXM]: keep the key identifier column locked while other columns scroll, or switch to data cards with the identifier in the top-left of each card; never drop the identifier.
+- **Multi-hue charts** [UXM]: hue-only series fail for colour-vision deficiencies; vary lightness (luminance) between series and label directly.
 
 ## Key Concepts
 - **Preattentive variable**; **encoding**; **layering** [TID].

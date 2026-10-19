@@ -1,11 +1,18 @@
 # Cheatsheet — Decisions, Thresholds, Tells
 
+## Contents
+- Thresholds & defaults
+- Decision rules
+- Source conflicts (defaults)
+- Trade-off matrix: validation timing [PUI]
+- Tells & smells (if you see X → likely problem Y)
+
 ## Thresholds & defaults
 | Thing | Default | Range / note | Src |
 |---|---|---|---|
 | Text contrast | ≥4.5:1 | large text (≥24px, ≥18.66px bold) ≥3:1 | PUI, RUI |
 | UI component / meaningful icon / input border / focus ring | ≥3:1 | decorative exempt | PUI |
-| APCA body text | Lc 75 min, 90 preferred | UI elements 45; placeholder/disabled 30 | PUI |
+| APCA body text (optional extra check, not WCAG) | Lc 75 min, 90 preferred | UI elements 45; placeholder/disabled 30; pass WCAG 2 first | PUI |
 | Touch target | 48×48 | iOS 44pt, Android 48dp; desktop button 40px tall OK with ≥44 hit | PUI, TID, KUL |
 | Gap between targets | 16px | min 8px | PUI |
 | Spacing scale | 4·8·12·16·24·32·48·64·80·96 | neighbours ≥~25% apart | RUI, PUI, KUL |
@@ -28,7 +35,12 @@
 | Autocomplete suggestions | ≤10 | bold the difference | PUI |
 | Multi-step form | ~5 questions/step | show progress + review | PUI |
 | Loading feedback | >1s show indicator | >10s progress + cancel | TID, WSG |
-| Animation | ~200–300ms | local, interruptible; respect reduced motion | TID |
+| Animation | ~200–300ms | 100–150 small feedback · 200–300 components · 300–500 large surfaces; respect reduced motion (ch18) | TID, DUI |
+| Toast | 1–2 lines, 240–360px wide, one at a time | auto-dismiss ≥5s only if non-critical and action-free; pause on hover/focus (ch16) | UXM, WCAG |
+| Text styles per screen | ≤3–4 | merge styles used once or twice | DUI |
+| Border widths / radii | 1 width, 2–3 radii | more needs a reason | DUI, PUI |
+| Interactive control height | one height per size tier | too small: <20px desktop, <40px phone | DUI |
+| Login lockout | ≥7 attempts before lockout; show-password toggle | email reset, short lockout | UXM |
 | Page load (commerce) | <4s | frustration ~10s | WSG |
 | Critical content desktop | within ~600–700px | top screen densest | WSG |
 | Search box | ≥27 characters wide | top-right or prominent | WSG |
@@ -59,6 +71,18 @@
 - **Same fact rendered in two places?** One must be the control, the other a visible reference to it (position, style, or explicit link) — not two independent read-outs that can drift. [ch12 S14]
 - **Two panels doing a structurally similar job?** Give both the same disclosure treatment (mount-on-demand + collapse-to-overlay); an asymmetry there is usually why only one of them turns out fragile under space pressure. [ch12 S15, ch03 L13]
 
+## Source conflicts (defaults)
+| Topic | Position A | Position B | Default |
+|---|---|---|---|
+| Brand colour on buttons | brand colour = interactive colour [PUI] | use a blue action colour, keep brand for highlights [UXM] | one action colour family that passes 4.5:1 for labels; brand hue if it passes, else a dedicated action hue |
+| Disabled submit | avoid, validate on submit [PUI] | enable only when required fields are filled (login) [UXM]; temporarily disabled with guidance [KUL] | enabled + validation; if disabled, explain and keep focusable (ch08 B7) |
+| Toast auto-dismiss | 2–5s, 3s ideal [UXM] | WCAG 2.2.1 timing concerns (practitioners disagree) | ch16 FB3 |
+| Consistency | follow standards, transfer learning [NIE] | functional inconsistency across contexts [MAR] | internal + platform consistency; document exceptions (ch17 IX10) |
+| Contrast method | APCA preferred for dark UI [PUI] | WCAG 2 is the requirement; APCA not in WCAG 3 draft | pass WCAG 2; APCA optional |
+| Icon labels | label non-universal icons [TID][PUI] | universal icons may stand alone [UXM] | label unless the icon is universal in context (search, close, menu, home); accessible name always |
+| Carousels | low engagement [common view] | fine with thumbnails/segments, no auto-rotate [UXM] | avoid for key content; if used: visible controls, "See all", no auto-advance (ch18 AN5) |
+| Expert review vs testing | audit finds issues fast [DUI] | expert review never the only evaluation [FRZ] | audit, then validate systemic Critical/High with users |
+
 ## Trade-off matrix: validation timing [PUI]
 | Approach | Feedback speed | Build cost | Risk |
 |---|---|---|---|
@@ -88,3 +112,10 @@
 - Carousel autoplay / video autoplay → loss of user control (ch07)
 - Empty table shows just "No data" → missed onboarding (ch06)
 - Sibling panel has `flex-grow` + only a `min-height` floor next to a `flex: 0 1 auto; min-height: 0` sibling → the floorless one gets starved to zero at short window heights, tools/actions vanish below the fold with no scroll cue — only shows up when you actually shrink the window (ch03 L13)
+- Many one-off text styles / colours in `style-inventory.js` → no tokens, design drift (DUI audit) → ch12 S1
+- Many distinct left edges or gaps in `alignment-grid.js` → no grid or spacing scale → ch03 L15
+- "Saved" with nothing visible → missing feedback → ch16 FB1
+- Modal opened from a modal → nested modals → ch16 FB9
+- Cancel takes a phone call, signup takes a click → hard to cancel → ch20 ET1
+- Assistant acts without preview → no approval step → ch19 CV5
+- Same object edited three different ways → conceptual inconsistency → ch17 IX7

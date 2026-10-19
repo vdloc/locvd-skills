@@ -2,6 +2,20 @@
 
 Sources: [RUI] "Working with Color" · [PUI] ch3 · [KUL] colours · [TID] ch5 · [WSG] ch8, ch11
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Design in greyscale first, then add colour with purpose: a palette of predefined shades with *roles* (brand/interactive, text strong/weak, strokes, fills, system states), every text and UI element meeting contrast minimums, and colour never the only carrier of meaning.
 
@@ -25,13 +39,14 @@ Design in greyscale first, then add colour with purpose: a palette of predefined
 - **Greys don't have to be grey** [RUI][PUI][KUL]: tint greys with blue (cool) or yellow/orange (warm) or the brand hue (5–15% overlay trick [KUL]); boost saturation at extremes.
 - **Contrast standards** —
   - WCAG 2.x AA [RUI][PUI][KUL]: text ≤18px (or <24px regular) ≥4.5:1; large text (≥24px regular or ≥18.66px/14pt bold) and UI components/meaningful graphics ≥3:1; decorative exempt. [KUL] system-status text ideally 7:1.
-  - APCA Lc (WCAG 3 draft) [PUI]: 90 preferred body (14px+); 75 min body (18px+); 60 other text (24px regular/16px bold); 45 large text (36px/24px bold) & UI elements; 30 absolute min (placeholder, disabled); 15 non-text. Polarity-aware; better for dark UIs and white-on-orange. Commercial compliance: meet WCAG 2; aim to pass both.
+  - APCA Lc [PUI] (an optional extra design check, not a WCAG requirement: it was removed from the WCAG 3 working draft and WCAG 3's contrast method is still undecided): 90 preferred body (14px+); 75 min body (18px+); 60 other text (24px regular/16px bold); 45 large text (36px/24px bold) & UI elements; 30 absolute min (placeholder, disabled); 15 non-text. Polarity-aware; better for dark UIs and white-on-orange. Commercial compliance: meet WCAG 2; aim to pass both.
 - **Accessible doesn't have to mean ugly** [RUI]: *flip the contrast* (dark coloured text on light tinted bg instead of white on saturated bg); for secondary text on dark coloured panels rotate hue toward a bright hue rather than approaching white.
 - **Don't rely on colour alone** [RUI][PUI][TID][WSG]: add icon/text/shape/underline/thicker border; trend cards get ▲▼ icons; charts differ by lightness as well as hue. ~8–10% of men have colour-vision deficiency.
 - **Brand colour discipline** [PUI]: one brand colour on interactive elements only (never on non-interactive headings/icons); multiple brand colours → the highest-contrast one is interactive, others decorative; light brand (yellow) → use text colour for links/buttons with ≥3:1 border; brand colour with semantic meaning (red) → don't use for actions.
 - **System colours** [PUI][KUL][RUI]: red error, amber/orange warning, green success (+ optional info); always with icons; text ≥4.5:1, elements ≥3:1.
 - **Colour for hierarchy & mood** [PUI][TID][KUL][WSG]: saturated = important/advancing, desaturated = background/receding; red most prominent; warm = inviting, cool = calm; dark bg = dramatic/luxury; one saturated colour among muted ones directs attention; 60-30-10 (primary/neutral/accent) as a starter [KUL]; nature-derived palettes harmonize [WSG]; avoid vibrating complementary pairs (bright blue on red) [TID]; avoid pure black text on white [PUI].
 - **Interaction state colours** [PUI]: opacity (hover 80%, disabled 20%, focus outline); fill swaps (menu hover=Fill, press=Stroke weak; brand button hover=Text weak, press=Text strong); transparent state layers (hover = Fill overlay, press = Stroke-weak overlay) work across themes.
+- **Dark-mode accents** [UXM]: a saturated light-mode accent vibrates and may fail on dark surfaces; derive a separate dark-mode accent with higher lightness and lower saturation, and tint dark greys slightly with the brand hue.
 
 ## Key Concepts
 - **Contrast ratio** 1:1–21:1 luminance ratio (WCAG 2).
@@ -58,7 +73,7 @@ Design in greyscale first, then add colour with purpose: a palette of predefined
 | C7 | No pure black on white for long text; no light-grey text | Dark grey (e.g. #1A1A1A-ish) | PUI |
 | C8 | Grey on colour | Secondary text on coloured surfaces uses tinted same-hue colour, passes contrast | RUI |
 | C9 | System colours | Error/warning/success consistent, paired with icons, passing contrast; red not used for non-destructive actions | PUI, KUL |
-| C10 | Dark mode | Elevation via lighter surfaces; contrast checked (APCA recommended); no pure black bg; semantic tokens remap | PUI |
+| C10 | Dark mode | Elevation via lighter surfaces; contrast meets WCAG 2 ratios in both themes (APCA optional extra); no pure black bg; semantic tokens remap | PUI |
 | C11 | Saturation discipline | Saturated colour reserved for emphasis; backgrounds muted | TID, WSG |
 | C12 | Theme/HC robustness | Works in OS high-contrast/forced-colours; doesn't rely on background images for meaning | TID, WSG |
 
@@ -86,7 +101,7 @@ Design in greyscale first, then add colour with purpose: a palette of predefined
 
 ## Conflicts & Context
 - HSL [RUI] vs HSB [PUI]: model choice is tooling; both reason in hue/saturation/lightness.
-- Contrast algorithm: WCAG 2 is the legal baseline today; APCA better predicts dark-mode & orange cases [PUI].
+- Contrast algorithm: WCAG 2 ratios are the conformance requirement. [PUI] prefers APCA because it better predicts dark-mode and orange cases, but APCA is not part of WCAG (not in the current WCAG 3 draft). Default: pass WCAG 2 first; use APCA only to refine choices that already pass, and document any exception.
 - Colour psychology: [KUL] leans on associations (blue trust, orange CTA); [PUI] says not universal (culture, personal, CVD) — use as loose guidance, test with users.
 
 ## Anti-patterns
@@ -104,7 +119,7 @@ Design in greyscale first, then add colour with purpose: a palette of predefined
 ## Key Takeaways
 1. Greyscale first; colour = function.
 2. Predefine 9-step scales and semantic roles; no ad-hoc colours.
-3. 4.5:1 text, 3:1 UI/large; check real surfaces; consider APCA.
+3. 4.5:1 text, 3:1 UI/large; check real surfaces in both themes; APCA only as an extra check.
 4. Never colour alone.
 5. One interactive colour; brand off non-interactive elements.
 6. Dark mode = lighter elevated surfaces + remapped tokens.

@@ -2,6 +2,16 @@
 
 Format: **Name** — when to use · how (key rules) · trade-off. Tags = source; chapter = where expanded.
 
+## Contents
+- Structure & Navigation [TID ch2–3 → ch10]
+- Layout & Chunking [TID ch4, RUI, PUI → ch02–03, ch12]
+- Mobile [TID ch6 → ch14]
+- Lists & Data [TID ch7, ch9 → ch11]
+- Actions [TID ch8, PUI ch7, RUI → ch08]
+- Forms [TID ch10, PUI ch8 → ch09]
+- Visual Polish [RUI → ch05–07]
+- Feedback, AI & Trust [UXM, CHM, MAR → ch16, ch19, ch20]
+
 ## Structure & Navigation [TID ch2–3 → ch10]
 - **Feature, Search, and Browse** — content/product catalogues · featured item in Center Stage + prominent search + browsable categories near top · featured items define what the site is about.
 - **Mobile Direct Access** — single-purpose app · first screen shows actionable result using location/time, no input · wrong assumptions frustrate.
@@ -113,3 +123,14 @@ Format: **Name** — when to use · how (key rules) · trade-off. Tags = source;
 - **Labels are a last resort** — self-describing values ("3 bedrooms").
 - **Text on images** — overlay, lower contrast, colorize, glow shadow.
 - **Everything has an intended size** — don't scale icons/screenshots/logos; enclose small icons in shapes.
+
+## Feedback, AI & Trust [UXM, CHM, MAR → ch16, ch19, ch20]
+- **Toast with Undo** — reversible destructive action · "Item deleted · Undo", persistent until dismissed or timed with pause on hover/focus, `role=status` · replaces most confirmations [UXM][TID]
+- **Chained Modal** — multi-step task inside a dialog · steps replace each other, Back instead of Cancel, step dots when >2 · only stack for destructive confirmation [UXM]
+- **Outcome-Named Confirmation** — data to verify before commit · title names the task, buttons name outcomes, data shown large · no Yes/No [UXM]
+- **Quick Replies** — conversational turns with likely answers · chips under the message · reveal features without typing [CHM]
+- **Grounded Answer** — AI answers about facts or policy · answer + sources with snippet beneath · builds verifiable trust [CHM]
+- **Preview-then-Act** — agent actions with side effects · draft card, confirm, then Undo window · keeps user in control [CHM]
+- **Deterministic Fallback** — any AI path · classic form or human route when the model fails, input preserved [CHM]
+- **Honest Exit** — subscriptions and accounts · cancel in settings, one confirmation, skippable retention offer · trust over short-term retention [MAR]
+

@@ -2,9 +2,19 @@
 
 **Purpose:** Grounds a future revision of `chapters/ch03-layout-spacing-grids.md` and `chapters/ch09-forms-input.md` in primary UX research — original studies, official design-system docs, first-party research orgs — specifically on (a) how form inputs should be arranged relative to each other, and (b) how supporting diagrams/illustrations should be arranged relative to form inputs and page content.
 
-**Status:** Research only. No chapter or SKILL.md file has been edited. Each finding below states whether it CONFIRMS, EXTENDS, or CONTRADICTS the existing chapter text (quoted verbatim from the current files as of this research).
+**Status:** Merged into ch03 (L13–L14) and ch09 (FM16–FM20) on 2026-09-17; kept as the evidence record. FM21–FM26 come from later research held by the `refactoring-web-form-layout` skill. Each finding below states whether it CONFIRMS, EXTENDS, or CONTRADICTS the existing chapter text (quoted verbatim from the current files as of this research).
 
 ---
+
+## Contents
+- 1. Label placement & field grouping — Luke Wroblewski / Penzo eye-tracking research
+- 2. Baymard Institute — form-layout usability research
+- 3. NN/g (Nielsen Norman Group) — form design & layout articles
+- 4. Official design-system documentation — form-layout specs
+- 5. Gestalt principles applied to form/diagram layout
+- 6. WCAG 2.2 — success criteria bearing on form/diagram layout & reading order
+- Gaps found (concrete, editable form)
+- Sources index (all primary/first-party)
 
 ## 1. Label placement & field grouping — Luke Wroblewski / Penzo eye-tracking research
 

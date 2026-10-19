@@ -2,6 +2,20 @@
 
 Sources: [RUI] "Designing Text" · [PUI] ch5 · [TID] ch5 · [WSG] ch9 · [KUL] style guides
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Readable UI type comes from a small, hand-tuned system: one (maybe two) quality typefaces, a constrained type scale, few weights, line length ~45–75 characters, line height inversely proportional to size, left alignment, and semantic markup that lets the text adapt to users.
 

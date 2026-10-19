@@ -2,6 +2,20 @@
 
 Sources: [WSG] ch5–7, ch9–12 · [PUI] ch1, ch3, ch7–8 · [TID] ch1 Keyboard Only, ch5 accessibility, ch8 keyboard · [KUL] contrast & keyboard · [RUI] colour
 
+## Contents
+- Core Idea
+- Frameworks Introduced
+- Key Concepts
+- Mental Models
+- Audit Checks
+- Fix Recipes
+- Conflicts & Context
+- Anti-patterns
+- Worked Example
+- Key Takeaways
+- Connects To
+
+
 ## Core Idea
 Accessibility is usability for everyone, including temporary and situational limits: semantic native HTML, perceivable content (contrast, alternatives, no colour-only meaning), keyboard/touch/AT operability with visible focus, content that adapts to user settings and zoom, and clear, forgiving interaction. It's also a legal requirement in many places and good for business [PUI].
 
@@ -86,7 +100,7 @@ a:where(p a, li a){ text-decoration:underline; text-underline-offset:.15em; }
 
 ## Conflicts & Context
 - Book-era references: [WSG] cites WCAG 2.0 and [PUI] WCAG 2.1 AA; current baseline is WCAG 2.2 AA (adds focus appearance/not obscured, target size minimum 24×24, dragging alternatives, accessible authentication, consistent help, redundant entry). Design standard of 44–48px targets exceeds it.
-- APCA [PUI] is draft — use alongside, not instead of, WCAG 2 ratios for compliance.
+- APCA [PUI] is not part of WCAG (it is not in the current WCAG 3 draft, whose contrast method is undecided) — use it alongside, never instead of, WCAG 2 ratios.
 
 ## Anti-patterns
 - **Removing focus outlines** for aesthetics.

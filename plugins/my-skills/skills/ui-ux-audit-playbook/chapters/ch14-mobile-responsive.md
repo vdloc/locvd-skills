@@ -20,6 +20,7 @@ Design mobile-first: strip to what mobile users actually need, linearise content
 - **Don't disable pinch zoom** [WSG]: locks out low-vision users; aesthetic reasons don't justify it.
 - **Input on mobile** [TID][KUL][PUI]: autocomplete, prefill, correct keyboards (`type`, `inputmode`, `autocomplete`), steppers, pickers; avoid long dropdowns → full-screen searchable sheet.
 - **Load & performance** [WSG]: conversions drop when load >~4s; frustration ~10s; srcset, compression, SVG, few web fonts.
+- **Bottom sheets for mobile modals** [UXM]: sheet rises from the bottom, backdrop stays partly visible, fixed header with title, close button and drag handle, content scrolls inside; swipe-down dismiss has a visible button alternative.
 
 ## Key Concepts
 - **Mobile-first**; **progressive enhancement**; **breakpoint**; **thumb zone**; **touch target**; **viewport meta**; **layer-cake effect** [TID]; **CSS pixel** [WSG].
