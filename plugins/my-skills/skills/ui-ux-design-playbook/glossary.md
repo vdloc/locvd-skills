@@ -1,0 +1,110 @@
+# Glossary
+
+Chapter refs → `chapters/chNN-*.md`. Source tags: RUI Refactoring UI · PUI Practical UI · KUL How to Design Better UI Components · TID Designing Interfaces · WSG Web Style Guide · FRZ Franz & Kauer-Franz · MAR Marsh · NIE Nielsen (ed.) · DUI Malewicz · UXM UX Movement · CHM Michel · NAT Natoli · FDP Silver · JK Krehel interfaces skills · design-engineering skills tags (VWG, EK, IMP, KK, TS, ID, AFD, IB, RS, AL, UIR, MCH) are listed in SKILL.md *Sources*.
+
+- **80/20 Rule (Pareto)** — ~80% of use comes from ~20% of features; optimise those (ch01)
+- **Accent border** — short coloured rule adding character to cards/alerts/nav (ch06)
+- **Accessible name / role / value** — programmatic label, type and state of a control; WCAG 4.1.2 (ch15)
+- **Action pyramid** — one primary, few secondary, some tertiary actions (ch02, ch08)
+- **Affordance** — visual cue that something can be clicked/dragged/typed (ch08)
+- **Alt text** — text alternative for images; empty for decorative (ch07, ch15)
+- **APCA** — Accessible Perceptual Contrast Algorithm; Lc values (90/75/60/45/30/15); a design aid, not part of WCAG (ch05)
+- **Appropriate friction** — a deliberate step that prevents regretted mistakes, proportional to cost (ch08, ch20) [MAR]
+- **Approval trail** — record of actions an agent proposes, with review/confirm/override before execution (ch19) [CHM]
+- **Atomic design** — atoms → molecules → organisms → templates → pages (ch12)
+- **Banner / toast / modal alert** — global persistent message / transient personal feedback / blocking decision (ch16) [UXM]
+- **Banner blindness** — users ignore ad-like areas (ch02, ch10)
+- **Baseline alignment** — align mixed font sizes on the text baseline, not centre (ch03, ch04)
+- **Batch filters** — choose several filter options, then apply once; honest and fast, vs interactive filters that apply per click (ch21) [FDP]
+- **Blast radius** — the screens a changed file renders in; a change review inspects those, not just the diff (change-review.md) [JK]
+- **Breadcrumbs** — hierarchical trail of parent links (ch10)
+- **Card sorting** — open/closed/reverse methods to derive or test taxonomy (ch10)
+- **Chained modal** — one modal whose steps replace each other with Back, instead of stacked modals (ch16) [UXM]
+- **Cognitive load** — mental effort needed to use a UI (ch01)
+- **Common region** — grouping by shared container (ch03)
+- **Concentric radius** — outer radius = inner radius + padding + border, so nested corners stay parallel (ch06 D11) [JK]
+- **Consistency matrix** — conceptual, communication and physical consistency, each internal and external (ch17) [NIE]
+- **Controlled vocabulary** — one consistent label per concept (ch10, ch13)
+- **Dead zone** — gap between interactive siblings where pointer events land on nothing; fix by putting spacing inside each target (ch15 A28) [MCH]
+- **Deceptive pattern** — interface design that steers users against their own interest (ch20)
+- **Deep link** — URL restoring location and state (ch10)
+- **Deferred choices** — let users skip non-essential questions until later (ch01, ch09)
+- **Design grid** — count of distinct alignment lines and gap values as a calmness measure (ch03) [FRZ]
+- **Design system** — tokens + reusable components + usage guidelines (ch12)
+- **Desire lines** — paths users actually take (ch13)
+- **Diagnostic design** — treat observations as symptoms, cluster them, test the most likely cause (audit-workflow.md step 9) [MAR]
+- **Down style** — sentence-case headings (ch04, ch13)
+- **Elevation** — perceived z-position via shadow or surface lightness (ch06)
+- **Empty state** — UI shown before content exists; onboarding opportunity (ch06, ch12)
+- **Escalation trigger** — a confirmed defect that is at least High however minor the surface (audit-workflow.md *Severity*) [JK]
+- **Escape hatch** — clear way back to a safe place (ch10)
+- **Evidence tag** — Measured / Observed / Inferred label on every audit finding (SKILL ground rules)
+- **Exit symmetry** — leaving is no harder than joining (ch20)
+- **F-pattern / Gutenberg Z** — common scanning paths; top-left gets most attention (ch02, ch10)
+- **Fat menu** — organised mega menu exposing many subpages (ch10)
+- **Fitts's Law** — larger/closer targets are faster to hit (ch01, ch08)
+- **Fix-preference ladder** — delete → use the platform → reuse a project token → correct the value → add (audit-workflow.md step 6) [JK]
+- **Focus plus context** — detail view while keeping surrounding overview (ch11)
+- **Forgiving format** — accept varied input syntax and parse it (ch09)
+- **Friction (destructive)** — initial/light/moderate/heavy confirmation levels (ch08)
+- **Front-loading** — key words/benefit at the start of text (ch13)
+- **Functional inconsistency** — deliberate difference across contexts because it works better there (ch17) [MAR]
+- **Gestalt principles** — proximity, similarity, continuity, closure, figure-ground, common region (ch03)
+- **Goal-Gradient Effect** — motivation rises near completion; show progress (ch09)
+- **Gutter** — empty space between grid columns (ch03)
+- **Habituation** — repeated actions become reflexive; confirmations lose power (ch01, ch08)
+- **Hick's Law** — decision time grows with number of choices (ch01)
+- **HSB / HSL** — hue-saturation-brightness/lightness colour models (ch05)
+- **Idea sentence** — "On this page, [something from the subject] becomes [the device]"; fails the competitor test if a rival's name fits (design-workflow.md §3) [TS]
+- **Information architecture (IA)** — organising & labelling an information space (ch10)
+- **Inline validation** — checking a field when the user leaves it (ch09)
+- **Interaction contract** — the observable promises of an interaction: trigger, feedback, persistence, interruption, failure and recovery, focus (design-workflow.md §7) [KK]
+- **Interaction cost** — total physical + mental effort for a task (ch01)
+- **Introduced / Regression / Pre-existing** — change-review statuses: created by the change, weakened by it, or present before and not worsened (change-review.md) [JK]
+- **Inverted pyramid** — most important info first, details last (ch13)
+- **ISO 9241-110** — seven interaction principles: task suitability, self-descriptiveness, conformity with expectations, learnability, controllability, use-error robustness, user engagement (ch17) [FRZ]
+- **Jakob's Law** — users prefer your site to work like others they know (ch01)
+- **LATCH** — Location, Alphabet, Time, Category, Hierarchy organising schemes (ch10)
+- **Layer-cake effect** — logos/ads/tabs stacking and pushing mobile content down (ch14)
+- **Line length (measure)** — characters per line; ~45–75 ideal (ch04)
+- **Live region** — element whose updates assistive tech announces (`role=status`, `role=alert`) (ch16, ch15)
+- **Logical properties** — `margin-inline-start`, `inset-inline-end` etc.; flip automatically under `dir="rtl"` (ch03 L16) [JK]
+- **MECE** — mutually exclusive, collectively exhaustive categories (ch10)
+- **Mobile-first** — design smallest screen first, enhance upward (ch14)
+- **Modal panel** — overlay requiring response before returning (ch10, ch12)
+- **Mode error** — action misfires because of an unnoticed state (ch17, ch16) [UXM]
+- **Modular / type scale** — ratio- or hand-crafted set of font sizes (ch04)
+- **Opt-in field** — optional input revealed only after the user chooses it (ch09)
+- **Pattern library** — live code collection of reusable UI patterns (ch12)
+- **Preattentive variables** — colour, size, position, shape etc. perceived instantly (ch11)
+- **Primitive vs semantic colour** — appearance-named vs usage-named tokens (ch05)
+- **Product-type frame** — weighting audit priorities by how the product creates value: e-commerce, content, marketplace, B2B, social, game, internal tool, data/AI (ch01) [MAR]
+- **Progressive disclosure** — reveal information/options only when needed (ch02, ch12)
+- **Refinement vs redesign** — refinement keeps the incumbent look and everything outside scope; redesign keeps product truth but replaces the look (design-workflow.md §0) [IMP]
+- **Rule of Thirds** — place photo subject on third-line intersections (ch07)
+- **Satisficing** — choosing the first "good enough" option (ch01)
+- **Scent of information** — link cues signalling progress toward a goal (ch10)
+- **Screen magnifier** — AT enlarging a small portion of the screen (ch15)
+- **Semantic markup** — HTML chosen for meaning, not appearance (ch15)
+- **Semantic token** — a colour (or other) token named by role, pointing at a primitive; the only tier components use (ch05 C13) [JK]
+- **Serial Position Effect** — first/last items remembered best (ch01, ch02)
+- **Signature** — one element that could only exist for this product; pointed to in at least five places (design-workflow.md §3, §11) [ID]
+- **Signpost** — "you are here" cue: titles, tabs, breadcrumbs, selection (ch10)
+- **Squint test** — blur/squint to check hierarchy & grouping (ch02)
+- **Stroke strong / weak** — meaningful (≥3:1) vs decorative border colours (ch05)
+- **Style inventory** — census of every text style, colour, radius, border, shadow and control height in use (ch12, evidence.md) [DUI]
+- **Swap test** — swap your typeface or layout for the usual one; where nothing changes, you defaulted (design-workflow.md §11) [ID]
+- **Tabular figures** — digits of equal width (`font-variant-numeric: tabular-nums`) so changing numbers don't shift (ch04 T17)
+- **Text strong / weak** — primary vs supporting text colour roles (ch05)
+- **Thumb zone** — screen area reachable one-handed (ch14)
+- **Token** — named design value (colour, space, type, radius, shadow) (ch12)
+- **Touch target** — tappable area; ≥44–48px (ch08, ch14)
+- **Transparent state layer** — hover/press overlay using alpha fills (ch05)
+- **Turn-taking** — making clear who "speaks" next in a conversational UI (ch19) [CHM]
+- **UX debt** — accumulated divergent styles/components (ch12)
+- **Visitor mode** — Persuade / Operate / Read / Experience; what success looks like on one surface, which decides how much expression and motion it earns (design-workflow.md §0) [IMP]
+- **Visual Framework** — shared layout/style skeleton across screens (ch12)
+- **Visual hierarchy** — relative perceived importance of elements (ch02)
+- **WCAG AA** — contrast 4.5:1 text, 3:1 large text & UI; baseline accessibility standard (ch05, ch15)
+- **Wireframe** — plain structural layout without visual styling (ch10)
+- **x-height** — height of lowercase letters; taller = more legible small (ch04)

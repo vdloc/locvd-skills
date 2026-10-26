@@ -1,6 +1,6 @@
 # checkout.html — seeded ground truth
 
-Answer key for the `ui-ux-audit-playbook--*` cases that scaffold `checkout.html`.
+Answer key for the `ui-ux-design-playbook--*` cases that scaffold `checkout.html`.
 This file is never copied into a run's workspace.
 
 ## Seeded defects (an audit should find these)
@@ -40,7 +40,7 @@ correct audit marks them unverified rather than rating them Critical or High.
 
 # account.html — seeded ground truth
 
-Used by `ui-ux-audit-playbook--static-account-wcag22`. Tests the WCAG 2.2 procedures (focus-walk, text-spacing, live-regions, wcag22-inventory).
+Used by `ui-ux-design-playbook--static-account-wcag22`. Tests the WCAG 2.2 procedures (focus-walk, text-spacing, live-regions, wcag22-inventory).
 
 | # | Defect | Where | Check |
 |---|---|---|---|

@@ -2,23 +2,23 @@
 
 Layout follows `claude plugin eval` (one directory per case, `prompt.md` + `graders/*.md`, optional `case.yaml`). Case names are prefixed with the skill they test.
 
-## ui-ux-audit-playbook
+## ui-ux-design-playbook
 
 | Case | Tests | Needs `--scaffold` |
 |---|---|---|
-| `ui-ux-audit-playbook--static-audit-recall` | finds seeded defects in `checkout.html`; findings name elements and give severity reasons; decorative `alt=""` not flagged | yes |
-| `ui-ux-audit-playbook--unobservable-not-high` | behaviour after "Pay now" (not observable in a static file) is not asserted as Critical/High | yes |
-| `ui-ux-audit-playbook--contrast-standard-current` | keeps WCAG 2 contrast as the requirement; does not claim WCAG 3 adopted APCA | no |
-| `ui-ux-audit-playbook--ai-chat-review` | AI panel spec: turn-taking, status announcements, sources, approval before acting, fallback | no |
-| `ui-ux-audit-playbook--static-account-wcag22` | WCAG 2.2 defects in `account.html`: focus hidden under a fixed cookie bar, focus outline removed, clipped title under text spacing, paste blocked on password, toast without live region, drag-only list; 3 traps | yes |
-| `ui-ux-audit-playbook--toast-timing` | errors and actionable toasts persist; hover/focus pause; live regions | no |
+| `ui-ux-design-playbook--static-audit-recall` | finds seeded defects in `checkout.html`; findings name elements and give severity reasons; decorative `alt=""` not flagged | yes |
+| `ui-ux-design-playbook--unobservable-not-high` | behaviour after "Pay now" (not observable in a static file) is not asserted as Critical/High | yes |
+| `ui-ux-design-playbook--contrast-standard-current` | keeps WCAG 2 contrast as the requirement; does not claim WCAG 3 adopted APCA | no |
+| `ui-ux-design-playbook--ai-chat-review` | AI panel spec: turn-taking, status announcements, sources, approval before acting, fallback | no |
+| `ui-ux-design-playbook--static-account-wcag22` | WCAG 2.2 defects in `account.html`: focus hidden under a fixed cookie bar, focus outline removed, clipped title under text spacing, paste blocked on password, toast without live region, drag-only list; 3 traps | yes |
+| `ui-ux-design-playbook--toast-timing` | errors and actionable toasts persist; hover/focus pause; live regions | no |
 
 `_fixtures/checkout.html` and `_fixtures/account.html` are the seeded pages; `_fixtures/SEEDED.md` is the answer key for both and is never copied into a run. `fixture.sh` in each scaffolded case copies only its page. Both pages can also be served (`python3 -m http.server`) to exercise the Playwright scripts by hand.
 
 Run (each run is a full Claude session on your own quota; the default is 3 runs per arm plus a no-plugin baseline arm):
 
 ```
-claude plugin eval plugins/my-skills --tag ui-ux-audit-playbook --scaffold --runs 1 -j 1
+claude plugin eval plugins/my-skills --tag ui-ux-design-playbook --scaffold --runs 1 -j 1
 ```
 
 ## Limits
